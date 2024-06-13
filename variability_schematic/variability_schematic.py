@@ -186,7 +186,7 @@ def make_bias_error(nx, ny):
 
     return data_grid
 
-# Make fonts in
+# Make fonts in pdf and svg render correctly in other programs
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
