@@ -294,7 +294,7 @@ axs[2, 4].pcolormesh(bias, cmap=cmap_artificial)
 axs[2, 5].plot(bias[mid, :], color=cmap_artificial(0.5))
 axs[2, 4].text(1, ypos_text, 'Observational biases', fontsize=18)
 
-plt.savefig('variability_schematic.png', bbox_inches='tight', dpi=300)
+plt.savefig('variability_schematic.png', bbox_inches='tight', dpi=50)
 
 # If higher resolution is needed, you can change the dpi or use the svg option below. File size is large ~18 Mbytes
 plt.savefig('variability_schematic.svg', bbox_inches='tight')

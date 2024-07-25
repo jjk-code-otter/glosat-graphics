@@ -1,0 +1,98 @@
+"""
+Calculate global series from the ensemble members of GloSAT and HadCRUT
+"""
+
+import xarray as xa
+import os
+from pathlib import Path
+import matplotlib.pyplot as plt
+import numpy as np
+import datetime
+import matplotlib.dates as mdates
+
+data_dir_env = os.getenv('DATADIR')
+glosat_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
+hadcrut_dir = Path(data_dir_env) / 'ManagedData' / 'Data' / 'HadCRUT5'
+
+n_ensemble = 200
+
+glosat = np.zeros((2892, n_ensemble))
+hadcrut = np.zeros((2092, n_ensemble))
+
+filename = f'GloSATref.1.0.0.0.analysis.component_series.global.monthly.nc'
+print(filename)
+ds = xa.open_dataset(glosat_dir / filename)
+data = ds.tas_mean
+uncertainty = ds.tas_total_unc
+
+df_data = data.to_dataframe(name='tas')
+df_data = df_data.rolling(window=12).mean()
+
+df_uncertainty = uncertainty.to_dataframe(name='tas_total_unc')
+df_uncertainty = df_uncertainty.rolling(window=12).mean()
+
+glosat = df_data.tas.array[:]
+glosat_unc = df_uncertainty.tas_total_unc.array[:]
+glosat_time = df_data.index.array
+
+filename = 'HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.nc'
+print(filename)
+ds = xa.open_dataset(hadcrut_dir / filename)
+data = ds.tas_mean
+uncertainty_high = ds.tas_upper
+uncertainty_low = ds.tas_lower
+
+df_data = data.to_dataframe(name='tas')
+df_data = df_data.rolling(window=12).mean()
+
+df_uncertainty_high = uncertainty_high.to_dataframe(name='tas_upper')
+df_uncertainty_high = df_uncertainty_high.rolling(window=12).mean()
+
+df_uncertainty_low = uncertainty_low.to_dataframe(name='tas_lower')
+df_uncertainty_low = df_uncertainty_low.rolling(window=12).mean()
+
+hadcrut = df_data.tas.array[:]
+hadcrut_unc_lower = df_uncertainty_low.tas_lower.array[:]
+hadcrut_unc_upper = df_uncertainty_high.tas_upper.array[:]
+hadcrut_time = df_data.index.array
+
+
+
+fig, axs = plt.subplots(1, 1)
+fig.set_size_inches(18, 6)
+
+
+volcanoes = {
+    'pinatubo': [datetime.date(1991, 6, 12), datetime.date(1991, 6, 12)],
+    'chichon': [datetime.date(1982, 3, 29), datetime.date(1982, 3, 29)],
+    'agung': [datetime.date(1963, 2, 18), datetime.date(1963, 2, 18)],
+    'krakatoa': [datetime.date(1883, 8, 26), datetime.date(1883, 8, 26)],
+    'santamaria': [datetime.date(1902, 10, 24), datetime.date(1902, 10, 24)],
+    'hthh': [datetime.date(2022, 1, 15), datetime.date(2022, 1, 15)],
+    'consiguina': [datetime.date(1835, 1, 20), datetime.date(1835, 1, 20)],
+    'galunggung': [datetime.date(1822, 10, 8), datetime.date(1822, 10, 8)],
+    'tambora': [datetime.date(1815, 4, 10), datetime.date(1815, 4, 10)],
+    'unknown': [datetime.date(1808, 1, 1), datetime.date(1808, 1, 1)]
+}
+
+for volcano in volcanoes:
+    plt.plot(volcanoes[volcano], [-1.6, 1.3], color='#555555')  # HTHH
+
+axs.fill_between(hadcrut_time, hadcrut_unc_lower, hadcrut_unc_upper, alpha=0.5, facecolor='#ffe100', edgecolor=None)
+axs.plot(hadcrut_time, hadcrut, color='#ffe100', linewidth=1)
+
+axs.fill_between(glosat_time, glosat - glosat_unc, glosat + glosat_unc, alpha=0.5, facecolor='#ab4be3', edgecolor=None)
+axs.plot(glosat_time, glosat, color='#ab4be3', linewidth=1)
+
+# axs.spines['bottom'].set_position('zero')
+axs.spines['right'].set_visible(False)
+axs.spines['top'].set_visible(False)
+axs.set_xlim([datetime.date(1790, 1, 1), datetime.date(2024, 12, 31)])
+axs.xaxis.set_major_locator(mdates.YearLocator(base=20))
+axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+
+plt.gca().set_ylim(-1.6, 1.3)
+plt.gca().set_title("Global mean surface air temperature 1790-2021", pad=5, fontdict={'fontsize': 20}, loc='left')
+
+plt.savefig('long_time_series_official.png', bbox_inches='tight', dpi=600, transparent=True)
+plt.close()

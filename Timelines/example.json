@@ -1,0 +1,45 @@
+{
+  "start_year": 1845,
+  "end_year": 2025,
+  "labels": [
+    [1854, null, "Maury Conference"],
+    [1858, null, "Time routinely reported"],
+    [1868, null, "Suez Canal opens"],
+    [1874, null, "Early transatlantic steam ships"],
+    [1900, null, "SST Observations outnumber AT"],
+    [1914, null, "Panama Canal opens"],
+    [1914, 1918, "First World War"],
+    [1939, 1945, "Second World War"],
+    [1973, null, "Operational moored buoys"],
+    [1979, null, "AVHRR-1 nighttime SST possible"],
+    [1979, null, "Drifting buoys"],
+    [1985, null, "TAO moorings"],
+    [1991, null, "ATSR (dual view SST)"],
+    [1999, null, "PIRATA morrings"],
+    [2001, null, "TAO/TRITON"],
+    [2002, null, "AMSR-E (microwave SST)"],
+    [2005, null, "Drifter array complete"],
+    [2007, null, "Loss of ICOADS callsigns"],
+    [2012, null, "Loss of AATSR"]
+  ],
+  "images": [
+    [1850, null, "oldboat.png"],
+    [1875, null, "oldboat2.png"],
+    [1895, null, "oldboat3.png"],
+    [1905, null, "oldboat4.png"],
+    [1920, null, "oldboat5.png"],
+    [1939, null, "oldboat6.png"],
+    [1945, null, "oldboat7.png"],
+
+    [1973, null, "oldboat8.png"],
+    [1979, null, "oldboat9.png"],
+    [1979, null, "oldboat10.png"],
+    [1985, null, "oldboat11.png"],
+    [1991, null, "oldboat12.png"],
+    [2002, null, "oldboat13.png"],
+    [2005, null, "oldboat14.png"],
+    [2010, null, "oldboat15.png"],
+    [2010, null, "oldboat16.png"],
+    [2015, null, "oldboat17.png"]
+  ]
+}
