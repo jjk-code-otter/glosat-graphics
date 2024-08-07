@@ -48,7 +48,10 @@ class Timeline():
             tx2 = mpl.dates.date2num(date(year1, 12, 31))
             if year2 is not None:
                 tx2 = mpl.dates.date2num(date(year2, 12, 31))
-            ax.text(date(year1, 1, 1), 32, tag, rotation=45)
+
+#            ax.text(date(year1, 1, 1), 32, tag, rotation=45)
+            ax.text((tx+tx2)/2, 32, tag, rotation=45)
+
             for i in range(5):
                 delta = 5
                 ax.add_patch(Rectangle((tx + delta, 1 + i * 6), tx2 - tx - 2 * delta, 5,
@@ -60,20 +63,56 @@ class Timeline():
 
             img = Image.open(tag)
 
+
+
+            # Set up transforms from axis coordinates to normalised coordinates (0 to 1)
+            axis_to_data = ax.transAxes + ax.transData.inverted()
+            data_to_axis = axis_to_data.inverted()
+
+            # Get the image width and height and scale to unit height. To preserve the aspect ratio, need
+            # to further scale the width by the ratio of the figure width and height
             width, height = img.size
+            width = width / height
+            width = width / 2
 
+            # Transform the width and height into the axis coordinate system
+            points_data0 = axis_to_data.transform((0, 0))
+            points_data1 = axis_to_data.transform((width, 1))
+
+            # Scale the transformed coordinates to the desired size (difference between ty1 and ty2
+            scale = (points_data1[1] - points_data0[1]) / 35.
+
+            # Set the location of the image. Alternate images are plotted high and low.
             tx = mpl.dates.date2num(date(year1, 1, 1))
-            ty = -15
+            ty1 = -15
             ty2 = -50
-
             if high_image:
                 high_image = False
-                ty = -50
+                ty1 = -50
                 ty2 = -85
             else:
                 high_image = True
 
-            ax.imshow(img, extent=[tx - 5 * 365, tx + 365 * 5, ty2, ty], aspect=100, cmap='gray')
+            scaled_width = (points_data1[0] - points_data0[0]) / scale
+
+            # plt.plot(
+            #     [tx - scaled_width / 2, tx + scaled_width / 2, tx + scaled_width / 2, tx - scaled_width / 2, tx - scaled_width / 2],
+            #          [ty2, ty2, ty1, ty1, ty2],
+            #          color='black'
+            # )
+
+            ax.imshow(img, extent=[tx - scaled_width / 2, tx + scaled_width / 2, ty2, ty1],
+                      aspect='auto')  # , cmap='gray')
+
+
+
+        axs.spines['bottom'].set_position('zero')
+        axs.spines['right'].set_visible(False)
+        axs.spines['left'].set_visible(False)
+        axs.spines['top'].set_visible(False)
+        axs.xaxis.set_major_locator(mdates.YearLocator(base=10))
+        axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+        axs.get_yaxis().set_visible(False)
 
         return
 
@@ -87,14 +126,6 @@ fig, axs = plt.subplots(1, sharex=True)
 fig.set_size_inches(16, 8)
 
 f.plot(axs)
-
-axs.spines['bottom'].set_position('zero')
-axs.spines['right'].set_visible(False)
-axs.spines['left'].set_visible(False)
-axs.spines['top'].set_visible(False)
-axs.xaxis.set_major_locator(mdates.YearLocator(base=10))
-axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-axs.get_yaxis().set_visible(False)
 
 plt.savefig('time_line.svg')
 plt.savefig('time_line.png', bbox_inches="tight", dpi=300)

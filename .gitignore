@@ -55,3 +55,5 @@ MANIFEST
 *.pdf
 *.png
 *.svg
+# Numpy save files
+*.npy

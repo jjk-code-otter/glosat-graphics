@@ -6,6 +6,7 @@ from pathlib import Path
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+from datetime import date
 from cartopy.util import add_cyclic_point
 import cartopy.crs as ccrs
 
@@ -37,8 +38,8 @@ def plot_map(inarry, filename):
     #                 extend='none'
     #                 )
 
-    p = ax.pcolormesh(wrap_lon, data.latitude, wrap_data[:,:], shading='auto', transform=ccrs.PlateCarree(),
-                      cmap=mpl.cm.Purples, vmin=-0.3,vmax=1.7)
+    p = ax.pcolormesh(wrap_lon, data.latitude, wrap_data[:, :], shading='auto', transform=ccrs.PlateCarree(),
+                      cmap=mpl.cm.Purples, vmin=-0.3, vmax=1.7)
 
     # cbar = plt.colorbar(p, orientation='horizontal', fraction=0.06, pad=0.04)
 
@@ -48,6 +49,41 @@ def plot_map(inarry, filename):
 
     # label_text = f"Temperature difference from"
     # cbar.set_label(label_text, rotation=0, fontsize=15)
+
+    p.axes.coastlines(color='#222222', linewidth=2)
+    p.axes.set_global()
+
+    plt.savefig(filename, transparent=True, bbox_inches='tight')
+    plt.savefig(filename.replace('.png', '.svg'), transparent=True, bbox_inches='tight')
+    plt.close()
+
+    return
+
+def plot_anomaly_map(inarry, filename):
+
+    data = inarry.data
+    data[data == 0] = np.nan
+    inarry.data = data
+
+    data = inarry
+    lon = inarry.coords['longitude']
+    lon_idx = data.dims.index('longitude')
+
+    wrap_data, wrap_lon = add_cyclic_point(data.values, coord=lon, axis=lon_idx)
+
+    proj = ccrs.EqualEarth(central_longitude=0)
+
+    fig = plt.figure(figsize=(16, 9))
+    ax = fig.add_subplot(111, projection=proj, aspect='auto')
+    # p = ax.contourf(wrap_lon, data.latitude, wrap_data[:, :],
+    #                 transform=ccrs.PlateCarree(),
+    #                 levels=wmo_levels,
+    #                 colors=wmo_cols,
+    #                 extend='none'
+    #                 )
+
+    p = ax.pcolormesh(wrap_lon, data.latitude, wrap_data[:, :], shading='auto', transform=ccrs.PlateCarree(),
+                      cmap=mpl.cm.RdYlBu_r, vmin=-2, vmax=2)
 
     p.axes.coastlines(color='#222222', linewidth=2)
     p.axes.set_global()
@@ -73,10 +109,17 @@ def coverage_map(data, tag):
         plot_map(time_mean, f'coverage_{year}_{year + 49}_{tag}.png')
 
 
+def anomaly_map(data, tag):
+    data2 = copy.deepcopy(data)
+    for year in [1750, 1800, 1850, 1900, 1950, 2000]:
+        time_mean = data2.sel(time=slice(f'{year}-01-01', f'{year + 49}-12-31')).mean('time')
+        plot_anomaly_map(time_mean, f'anomalies_{year}_{year + 49}_{tag}.png')
+
+
 def areas_map(ds):
     data = ds.tas_median
     latsr = np.repeat(np.reshape(data.latitude.data, (36, 1)), 72, axis=1)
-    pull_data = data.data[0,:,:]
+    pull_data = data.data[0, :, :]
 
     selection = (latsr >= 65.0)
     pull_data[selection] = 0 - 0.1
@@ -91,9 +134,9 @@ def areas_map(ds):
     selection = (latsr < -65.0)
     pull_data[selection] = 4.0 - 0.1
 
-    data.data[0,:,:] = pull_data
+    data.data[0, :, :] = pull_data
 
-    wmo_cols = ['#58c9db', '#8ebf84', '#ffa473', '#8ebf84', '#58c9db','#58c9db']
+    wmo_cols = ['#58c9db', '#8ebf84', '#ffa473', '#8ebf84', '#58c9db', '#58c9db']
     wmo_levels = [0, 1, 2, 3, 4]
 
     lon = ds.tas_median.coords['longitude']
@@ -280,12 +323,16 @@ def plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_co
 
     # And unfilled
     alfa = 0.3
-    plt.fill_between(time, np.zeros(ntime) - polar_area + 0.50, np.zeros(ntime) - polar_area + 0.50 - smooth_coverage_unfilled[:, 6], color='white', alpha=alfa)
-    plt.fill_between(time, np.zeros(ntime) - 0.25, np.zeros(ntime) - 0.25 - smooth_coverage_unfilled[:, 5], color='white', alpha=alfa)
+    plt.fill_between(time, np.zeros(ntime) - polar_area + 0.50,
+                     np.zeros(ntime) - polar_area + 0.50 - smooth_coverage_unfilled[:, 6], color='white', alpha=alfa)
+    plt.fill_between(time, np.zeros(ntime) - 0.25, np.zeros(ntime) - 0.25 - smooth_coverage_unfilled[:, 5],
+                     color='white', alpha=alfa)
     plt.fill_between(time, np.zeros(ntime), 0.0 - smooth_coverage_unfilled[:, 4], color='white', alpha=alfa)
 
-    plt.fill_between(time, np.zeros(ntime) + polar_area - 0.5, np.zeros(ntime) + polar_area - 0.5 + smooth_coverage_unfilled[:, 1], color='white', alpha=alfa)
-    plt.fill_between(time, np.zeros(ntime) + 0.25, np.zeros(ntime) + 0.25 + smooth_coverage_unfilled[:, 2], color='white', alpha=alfa)
+    plt.fill_between(time, np.zeros(ntime) + polar_area - 0.5,
+                     np.zeros(ntime) + polar_area - 0.5 + smooth_coverage_unfilled[:, 1], color='white', alpha=alfa)
+    plt.fill_between(time, np.zeros(ntime) + 0.25, np.zeros(ntime) + 0.25 + smooth_coverage_unfilled[:, 2],
+                     color='white', alpha=alfa)
     plt.fill_between(time, np.zeros(ntime), smooth_coverage_unfilled[:, 3], color='white', alpha=alfa)
 
     plt.plot(time, np.zeros(ntime) + polar_area - 0.50, color='black', linewidth=0.5)
@@ -300,6 +347,35 @@ def plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_co
                           labelbottom=False, labeltop=False, labelleft=False, labelright=False)
     plt.gca().set_axis_off()
 
+    text_color = '#4F589D'
+
+    for y in [1750, 1800, 1850, 1900, 1950, 2000]:
+        t = plt.text(date(y, 1, 1), 0.53, f'{y}', fontsize=24, va='bottom', ha='center', color=text_color)
+        plt.text(date(y, 1, 1), -0.53, f'{y}', fontsize=24, va='top', ha='center', color=text_color)
+
+        r = fig.canvas.get_renderer()
+        bb = t.get_window_extent(renderer=r).transformed(axs.transData.inverted())
+        height = bb.height * 1.4
+
+        gap  = 9
+        ystart = date(y + gap, 1, 1)
+        yend = date(y + 50 - gap, 1, 1)
+
+        if y == 2000:
+            yend = date(2023 - gap + 2, 1, 1)
+
+        plt.plot(
+            [ystart, yend],
+            [0.53 + height / 2, 0.53 + height / 2], color=text_color
+        )
+        plt.plot(
+            [ystart, yend],
+            [-0.53 - height / 3, -0.53 - height /3], color=text_color
+        )
+
+    plt.text(date(2023, 1, 1), 0.53, f'Now', fontsize=24, va='bottom', ha='center', color=text_color)
+    plt.text(date(2023, 1, 1), -0.53, f'Now', fontsize=24, va='top', ha='center', color=text_color)
+
     plt.savefig('coverage_comparison_individual.png', dpi=300, transparent=True, bbox_inches='tight')
     plt.savefig('coverage_comparison_individual.svg', dpi=300, transparent=True, bbox_inches='tight')
     plt.savefig('coverage_comparison_individual.pdf', dpi=300, transparent=True, bbox_inches='tight')
@@ -310,6 +386,10 @@ data_dir_env = os.getenv('DATADIR')
 
 glosat_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
 filename = 'GloSATref.1.0.0.0.analysis.anomalies.ensemble_median.nc'
+
+ds = xa.open_dataset(glosat_dir / filename)
+data = ds.tas_median
+anomaly_map(data, 'anomalies')
 
 ds = xa.open_dataset(glosat_dir / filename)
 data = ds.tas_median

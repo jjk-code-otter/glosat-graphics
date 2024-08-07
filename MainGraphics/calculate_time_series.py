@@ -13,13 +13,44 @@ import matplotlib.dates as mdates
 data_dir_env = os.getenv('DATADIR')
 glosat_dir = Path(data_dir_env) / 'GloSAT' / 'glosatref1000'
 hadcrut_dir = Path(data_dir_env) / 'GloSAT' / 'hadcrut5'
+model_dir = Path(data_dir_env) / 'Model'
+
+particle = np.zeros((2736))
+filename = 'tas_Amon_HadCM3_DataAssimilationMean_r1i1p1_17812008.nc'
+ds = xa.open_dataset(model_dir / filename)
+data = ds.tas
+latsr = xa.ufuncs.deg2rad(data.latitude)
+weights = xa.ufuncs.cos(latsr)
+weighted_mean = data.weighted(weights).mean(dim=("latitude", "longitude"))
+df = weighted_mean.to_dataframe(name='tas')
+df = df.rolling(window=12).mean()
+print(filename)
+particle[:] = df.tas.array[:] - np.mean(df.tas.array[2172:2172 + 360])
+particle_time = df.index.array
+
+n_model = 10
+
+models = np.zeros((2749, n_model))
+
+for i in range(1, n_model + 1):
+    filename = f'tas_Amon_HadCM3_FreeRunning_r{i}i1p1_178012-200912.nc'
+    ds = xa.open_dataset(model_dir / filename)
+    data = ds.tas
+    latsr = xa.ufuncs.deg2rad(data.latitude)
+    weights = xa.ufuncs.cos(latsr)
+    weighted_mean = data.weighted(weights).mean(dim=("latitude", "longitude"))
+    df = weighted_mean.to_dataframe(name='tas')
+    df = df.rolling(window=12).mean()
+    print(filename)
+    models[:, i - 1] = df.tas.array[:] - np.mean(df.tas.array[2172:2172 + 360])
+    model_time = df.index.array
 
 n_ensemble = 200
 
 glosat = np.zeros((2892, n_ensemble))
 hadcrut = np.zeros((2092, n_ensemble))
 
-for i in range(1, n_ensemble+1):
+for i in range(1, n_ensemble + 1):
     filename = f'GloSATref.1.0.0.0.analysis.anomalies.{i}.nc'
     print(filename)
     ds = xa.open_dataset(glosat_dir / filename)
@@ -30,7 +61,7 @@ for i in range(1, n_ensemble+1):
     df = weighted_mean.to_dataframe(name='tas')
     df = df.rolling(window=12).mean()
 
-    glosat[:, i-1] = df.tas.array[:]
+    glosat[:, i - 1] = df.tas.array[:]
     glosat_time = df.index.array
 
     # plt.plot(df['tas'], color='black', alpha=0.2)
@@ -45,7 +76,7 @@ for i in range(1, n_ensemble+1):
     df = weighted_mean.to_dataframe(name='tas')
     df = df.rolling(window=12).mean()
 
-    hadcrut[:, i-1] = df.tas.array[:]
+    hadcrut[:, i - 1] = df.tas.array[:]
     hadcrut_time = df.index.array
 
     # plt.plot(df['tas'], color='red', alpha=0.2)
@@ -57,23 +88,40 @@ for i in range(1, n_ensemble+1):
 fig, axs = plt.subplots(1, 1)
 fig.set_size_inches(12, 6)
 
-summary_glosat = np.zeros((2892,3))
-summary_glosat[:,0] = np.mean(glosat, axis=1)
-summary_glosat[:,1] = np.quantile(glosat, 0.01, axis=1)
-summary_glosat[:,2] = np.quantile(glosat, 0.99, axis=1)
+summary_model = np.zeros((2749, 3))
+summary_model[:, 0] = np.mean(models, axis=1)
+summary_model[:, 1] = np.min(models, axis=1)
+summary_model[:, 2] = np.max(models, axis=1)
 
-summary_hadcrut = np.zeros((2092,3))
-summary_hadcrut[:,0] = np.mean(hadcrut, axis=1)
-summary_hadcrut[:,1] = np.quantile(hadcrut, 0.01, axis=1)
-summary_hadcrut[:,2] = np.quantile(hadcrut, 0.99, axis=1)
+np.save('model_summary.npy', summary_model)
+np.save('model_time.npy', model_time)
+np.save('particle_time.npy', particle_time)
+np.save('particle.npy', particle)
 
-axs.fill_between(glosat_time, summary_glosat[:,1], summary_glosat[:,2],alpha=0.5,facecolor='#ab4be3',edgecolor=None)
-axs.plot(glosat_time, summary_glosat[:,0],color='#ab4be3',linewidth=1)
+summary_glosat = np.zeros((2892, 3))
+summary_glosat[:, 0] = np.mean(glosat, axis=1)
+summary_glosat[:, 1] = np.quantile(glosat, 0.01, axis=1)
+summary_glosat[:, 2] = np.quantile(glosat, 0.99, axis=1)
 
-axs.fill_between(hadcrut_time, summary_hadcrut[:,1], summary_hadcrut[:,2],alpha=0.5,facecolor='#fcba03',edgecolor=None)
-axs.plot(hadcrut_time, summary_hadcrut[:,0],color='#fcba03',linewidth=1)
+summary_hadcrut = np.zeros((2092, 3))
+summary_hadcrut[:, 0] = np.mean(hadcrut, axis=1)
+summary_hadcrut[:, 1] = np.quantile(hadcrut, 0.01, axis=1)
+summary_hadcrut[:, 2] = np.quantile(hadcrut, 0.99, axis=1)
 
-#axs.spines['bottom'].set_position('zero')
+
+
+
+axs.fill_between(glosat_time, summary_glosat[:, 1], summary_glosat[:, 2], alpha=0.5, facecolor='#ab4be3', edgecolor=None)
+axs.plot(glosat_time, summary_glosat[:, 0], color='#ab4be3', linewidth=1)
+
+axs.fill_between(model_time, summary_model[:, 1], summary_model[:, 2], alpha=0.5, facecolor='#aaaaaa', edgecolor=None)
+axs.plot(model_time, summary_model[:, 0], color='#555555', linewidth=1)
+axs.plot(particle_time, particle, '--', color='#555555', linewidth=1, )
+
+axs.fill_between(hadcrut_time, summary_hadcrut[:, 1], summary_hadcrut[:, 2], alpha=0.5, facecolor='#fcba03', edgecolor=None)
+axs.plot(hadcrut_time, summary_hadcrut[:, 0], color='#fcba03', linewidth=1)
+
+# axs.spines['bottom'].set_position('zero')
 axs.spines['right'].set_visible(False)
 axs.spines['top'].set_visible(False)
 axs.set_xlim([datetime.date(1780, 1, 1), datetime.date(2024, 12, 31)])

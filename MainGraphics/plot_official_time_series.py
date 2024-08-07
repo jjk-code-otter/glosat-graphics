@@ -56,23 +56,25 @@ hadcrut_unc_lower = df_uncertainty_low.tas_lower.array[:]
 hadcrut_unc_upper = df_uncertainty_high.tas_upper.array[:]
 hadcrut_time = df_data.index.array
 
-
+summary_model = np.load('model_summary.npy', allow_pickle=True)
+model_time = np.load('model_time.npy', allow_pickle=True)
+particle_time = np.load('particle_time.npy', allow_pickle=True)
+particle = np.load('particle.npy', allow_pickle=True)
 
 fig, axs = plt.subplots(1, 1)
 fig.set_size_inches(18, 6)
 
-
 volcanoes = {
-    'pinatubo': [datetime.date(1991, 6, 12), datetime.date(1991, 6, 12)],
-    'chichon': [datetime.date(1982, 3, 29), datetime.date(1982, 3, 29)],
-    'agung': [datetime.date(1963, 2, 18), datetime.date(1963, 2, 18)],
-    'krakatoa': [datetime.date(1883, 8, 26), datetime.date(1883, 8, 26)],
-    'santamaria': [datetime.date(1902, 10, 24), datetime.date(1902, 10, 24)],
-    'hthh': [datetime.date(2022, 1, 15), datetime.date(2022, 1, 15)],
-    'consiguina': [datetime.date(1835, 1, 20), datetime.date(1835, 1, 20)],
-    'galunggung': [datetime.date(1822, 10, 8), datetime.date(1822, 10, 8)],
-    'tambora': [datetime.date(1815, 4, 10), datetime.date(1815, 4, 10)],
-    'unknown': [datetime.date(1808, 1, 1), datetime.date(1808, 1, 1)]
+'pinatubo': [datetime.date(1991, 6, 12), datetime.date(1991, 6, 12)],
+'chichon': [datetime.date(1982, 3, 29), datetime.date(1982, 3, 29)],
+'agung': [datetime.date(1963, 2, 18), datetime.date(1963, 2, 18)],
+'krakatoa': [datetime.date(1883, 8, 26), datetime.date(1883, 8, 26)],
+'santamaria': [datetime.date(1902, 10, 24), datetime.date(1902, 10, 24)],
+'hthh': [datetime.date(2022, 1, 15), datetime.date(2022, 1, 15)],
+'consiguina': [datetime.date(1835, 1, 20), datetime.date(1835, 1, 20)],
+'galunggung': [datetime.date(1822, 10, 8), datetime.date(1822, 10, 8)],
+'tambora': [datetime.date(1815, 4, 10), datetime.date(1815, 4, 10)],
+'unknown': [datetime.date(1808, 1, 1), datetime.date(1808, 1, 1)]
 }
 
 for volcano in volcanoes:
@@ -80,6 +82,10 @@ for volcano in volcanoes:
 
 axs.fill_between(hadcrut_time, hadcrut_unc_lower, hadcrut_unc_upper, alpha=0.5, facecolor='#ffe100', edgecolor=None)
 axs.plot(hadcrut_time, hadcrut, color='#ffe100', linewidth=1)
+
+axs.fill_between(model_time, summary_model[:, 1], summary_model[:, 2], alpha=0.5, facecolor='#aaaaaa', edgecolor=None)
+axs.plot(model_time, summary_model[:, 0], color='#555555', linewidth=1)
+axs.plot(particle_time, particle, '--', color='#555555', linewidth=1, )
 
 axs.fill_between(glosat_time, glosat - glosat_unc, glosat + glosat_unc, alpha=0.5, facecolor='#ab4be3', edgecolor=None)
 axs.plot(glosat_time, glosat, color='#ab4be3', linewidth=1)
