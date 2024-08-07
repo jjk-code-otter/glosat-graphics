@@ -4,11 +4,13 @@ import numpy as np
 import matplotlib
 
 
-def make_correlated_noise(nx: int, ny: int, stdev: float, x_length_scale: float, y_length_scale: float):
+def make_correlated_noise(rng, nx: int, ny: int, stdev: float, x_length_scale: float, y_length_scale: float):
     """
     Produce an array of spatially correlated noise. The size of the grid is nx by ny. The standard deviation is
     controlled by stdev and there are separate length scales for the x and y directions
 
+    :param rng:
+        Numpy random number generator
     :param nx: int
         Number of grid cells in x-direction
     :param ny: int
@@ -54,7 +56,7 @@ def make_correlated_noise(nx: int, ny: int, stdev: float, x_length_scale: float,
 
     # Draw samples from the covariance matrix using the cholesky decomposition
     chol = np.linalg.cholesky(covariance)
-    noise = np.random.normal(loc=0, scale=1.0, size=(1, nx * ny))
+    noise = rng.normal(loc=0, scale=1.0, size=(1, nx * ny))
     sample = np.matmul(noise, chol)
 
     # Put sample vector into the original 2D grid
@@ -104,11 +106,13 @@ def make_periodic_grid(nx: int, ny: int, var, freq: float = 5):
     return data_grid
 
 
-def make_outliers(nx: int, ny: int, cut_off: float, scale: float):
+def make_outliers(rng, nx: int, ny: int, cut_off: float, scale: float):
     """
     Designate random gridcells as outliers. Calculation is done by generating normally distributed noise. Setting
     any absolute value less than the cut_off to zero and scaling the remaining values by scale
 
+    :param rng:
+        Numpy random number generator
     :param nx: int
         Number of grid cells in x-direction
     :param ny: int
@@ -120,7 +124,7 @@ def make_outliers(nx: int, ny: int, cut_off: float, scale: float):
     :return: numpy arrau
         Returns an nx by ny numpy array containing random outliers
     """
-    data_grid = np.random.normal(0, 1.0, size=(nx, ny))
+    data_grid = rng.normal(0, 1.0, size=(nx, ny))
     outliers = abs(data_grid) > cut_off
     rest = abs(data_grid) < cut_off
     data_grid[rest] = 0.0
@@ -128,10 +132,12 @@ def make_outliers(nx: int, ny: int, cut_off: float, scale: float):
     return data_grid
 
 
-def make_white_noise(nx, ny, stdev):
+def make_white_noise(rng, nx, ny, stdev):
     """
     Create an nx by ny grid containing white noise with standard deviation equal to stdev
 
+    :param rng:
+        Numpy random number generator
     :param nx: int
         Number of grid cells in x-direction
     :param ny: int
@@ -141,15 +147,17 @@ def make_white_noise(nx, ny, stdev):
     :return: numpy array
         Returns an nx by ny numpy array containing white noise
     """
-    data_grid = np.random.normal(0, stdev, size=(nx, ny))
+    data_grid = rng.normal(0, stdev, size=(nx, ny))
     return data_grid
 
 
-def make_sampling(nx, ny, cut_off):
+def make_sampling(rng, nx, ny, cut_off):
     """
     Create a grid which has a random number of cells set to np.NaN. The missing cells are decided by generating
     correlated noise and removing any cell whose value exceeds the cut_off value.
 
+    :param rng:
+        Numpy random number Generator
     :param nx: int
         Number of grid cells in x-direction
     :param ny: int
@@ -159,7 +167,7 @@ def make_sampling(nx, ny, cut_off):
     :return: numpy array
         Returns an nx by ny numpy array with randomly chosen cells set to np.NaN
     """
-    data_grid = make_correlated_noise(nx, ny, 1, 3, 3)
+    data_grid = make_correlated_noise(rng, nx, ny, 1, 3, 3)
     outliers = abs(data_grid) > cut_off
     data_grid[:, :] = 0.0
     data_grid[outliers] = np.nan
@@ -190,6 +198,9 @@ def make_bias_error(nx, ny):
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
+seed = 45234573570987982
+rng = np.random.default_rng(seed)
+
 # Set grid size
 nx = 100
 ny = 100
@@ -203,17 +214,17 @@ cmap_diverge = plt.cm.plasma
 mid = int(nx / 2)
 
 # Generate the different components of real variability
-corr_noise_grid = make_correlated_noise(nx, ny, 0.1, 4, 12)
+corr_noise_grid = make_correlated_noise(rng, nx, ny, 0.1, 4, 12)
 trend_grid = quad_trend_grid(nx, ny)
 trend_grid = trend_grid - np.mean(trend_grid)
 
 periodic = make_periodic_grid(nx, ny, 0.05, 5)
 
 # and artificial variability
-outliers = make_outliers(nx, ny, 1.8, 0.25)
-white_noise = make_white_noise(nx, ny, 0.1)
+outliers = make_outliers(rng, nx, ny, 1.8, 0.25)
+white_noise = make_white_noise(rng, nx, ny, 0.1)
 bias = make_bias_error(nx, ny)
-sampling = make_sampling(nx, ny, 1.0)
+sampling = make_sampling(rng, nx, ny, 1.0)
 
 # Start the plot
 fig, axs = plt.subplots(3, 6)

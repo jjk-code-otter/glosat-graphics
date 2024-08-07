@@ -59,8 +59,8 @@ def plot_map(inarry, filename):
 
     return
 
-def plot_anomaly_map(inarry, filename):
 
+def plot_anomaly_map(inarry, filename):
     data = inarry.data
     data[data == 0] = np.nan
     inarry.data = data
@@ -75,16 +75,10 @@ def plot_anomaly_map(inarry, filename):
 
     fig = plt.figure(figsize=(16, 9))
     ax = fig.add_subplot(111, projection=proj, aspect='auto')
-    # p = ax.contourf(wrap_lon, data.latitude, wrap_data[:, :],
-    #                 transform=ccrs.PlateCarree(),
-    #                 levels=wmo_levels,
-    #                 colors=wmo_cols,
-    #                 extend='none'
-    #                 )
 
-    p = ax.pcolormesh(wrap_lon, data.latitude, wrap_data[:, :], shading='auto', transform=ccrs.PlateCarree(),
+    p = ax.pcolormesh(wrap_lon, data.latitude, wrap_data[:, :],
+                      shading='auto', transform=ccrs.PlateCarree(),
                       cmap=mpl.cm.RdYlBu_r, vmin=-2, vmax=2)
-
     p.axes.coastlines(color='#222222', linewidth=2)
     p.axes.set_global()
 
@@ -93,6 +87,35 @@ def plot_anomaly_map(inarry, filename):
     plt.close()
 
     return
+
+
+def plot_colorbar(filename):
+    fig, axs = plt.subplots(1)
+    fig.subplots_adjust(left=0.0, bottom=0.0, right=1, top=1)
+    fig.tight_layout()
+    img = axs.imshow(np.array([[0, 1]]), cmap="RdYlBu_r", vmin=-2, vmax=2)
+    img.set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.spines['right'].set_visible(False)
+    axs.spines['bottom'].set_visible(False)
+    axs.spines['left'].set_visible(False)
+    plt.tick_params(
+        axis='both',
+        which='both',
+        bottom=False,
+        top=False,
+        left=False,
+        labelbottom=False,
+        labelleft=False
+    )
+    cbar = fig.colorbar(orientation="horizontal", mappable=img)
+    cbar.set_ticks([-2,-1.5,-1.0,-0.5,0,0.5,1,1.5,2])
+    cbar.set_ticklabels(['', '', '', '', '', '', '', '', ''])
+    cbar.outline.set_linewidth(3)
+    cbar.ax.tick_params(width=3)
+
+    plt.savefig(filename, bbox_inches=mpl.transforms.Bbox([[0, 0.3], [6.5, 1.3]]))
+    plt.close()
 
 
 def coverage_map(data, tag):
@@ -357,7 +380,7 @@ def plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_co
         bb = t.get_window_extent(renderer=r).transformed(axs.transData.inverted())
         height = bb.height * 1.4
 
-        gap  = 9
+        gap = 9
         ystart = date(y + gap, 1, 1)
         yend = date(y + 50 - gap, 1, 1)
 
@@ -370,7 +393,7 @@ def plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_co
         )
         plt.plot(
             [ystart, yend],
-            [-0.53 - height / 3, -0.53 - height /3], color=text_color
+            [-0.53 - height / 3, -0.53 - height / 3], color=text_color
         )
 
     plt.text(date(2023, 1, 1), 0.53, f'Now', fontsize=24, va='bottom', ha='center', color=text_color)
@@ -386,6 +409,8 @@ data_dir_env = os.getenv('DATADIR')
 
 glosat_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
 filename = 'GloSATref.1.0.0.0.analysis.anomalies.ensemble_median.nc'
+
+plot_colorbar('colorbar.svg')
 
 ds = xa.open_dataset(glosat_dir / filename)
 data = ds.tas_median
