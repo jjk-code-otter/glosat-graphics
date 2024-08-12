@@ -57,3 +57,7 @@ MANIFEST
 *.svg
 # Numpy save files
 *.npy
+# Data files
+*.csv
+*.nc
+*.txt
