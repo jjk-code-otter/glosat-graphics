@@ -100,5 +100,6 @@ axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
 plt.gca().set_ylim(-1.6, 1.3)
 plt.gca().set_title("Global mean surface air temperature 1790-2021", pad=5, fontdict={'fontsize': 20}, loc='left')
 
-plt.savefig('long_time_series_official.png', bbox_inches='tight', dpi=600, transparent=True)
+plt.savefig(Path('OutputFigures') / 'long_time_series_official.png', bbox_inches='tight', dpi=600, transparent=True)
+plt.savefig(Path('OutputFigures') / 'long_time_series_official.svg', bbox_inches='tight', transparent=True)
 plt.close()

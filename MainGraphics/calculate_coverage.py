@@ -53,8 +53,8 @@ def plot_map(inarry, filename):
     p.axes.coastlines(color='#222222', linewidth=2)
     p.axes.set_global()
 
-    plt.savefig(filename, transparent=True, bbox_inches='tight')
-    plt.savefig(filename.replace('.png', '.svg'), transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / filename, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / filename.replace('.png', '.svg'), transparent=True, bbox_inches='tight')
     plt.close()
 
     return
@@ -82,8 +82,8 @@ def plot_anomaly_map(inarry, filename):
     p.axes.coastlines(color='#222222', linewidth=2)
     p.axes.set_global()
 
-    plt.savefig(filename, transparent=True, bbox_inches='tight')
-    plt.savefig(filename.replace('.png', '.svg'), transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / filename, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / filename.replace('.png', '.svg'), transparent=True, bbox_inches='tight')
     plt.close()
 
     return
@@ -114,7 +114,7 @@ def plot_colorbar(filename):
     cbar.outline.set_linewidth(3)
     cbar.ax.tick_params(width=3)
 
-    plt.savefig(filename, bbox_inches=mpl.transforms.Bbox([[0, 0.3], [6.5, 1.3]]))
+    plt.savefig(Path('OutputFigures') / filename, bbox_inches=mpl.transforms.Bbox([[0, 0.3], [6.5, 1.3]]))
     plt.close()
 
 
@@ -182,8 +182,8 @@ def areas_map(ds):
     p.axes.set_global()
 
     filename = 'areas_map.png'
-    plt.savefig(filename, transparent=True, bbox_inches='tight')
-    plt.savefig(filename.replace('.png', '.svg'), transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / filename, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / filename.replace('.png', '.svg'), transparent=True, bbox_inches='tight')
     plt.close()
 
 
@@ -275,9 +275,9 @@ def plot_non_centred_coverage_timeseries(time, smooth_coverage):
                           labelbottom=False, labeltop=False, labelleft=False, labelright=False)
     plt.gca().set_axis_off()
 
-    plt.savefig('coverage_centred.png', dpi=300, transparent=True, bbox_inches='tight')
-    plt.savefig('coverage_centred.svg', dpi=300, transparent=True, bbox_inches='tight')
-    plt.savefig('coverage_centred.pdf', dpi=300, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_centred.png', dpi=300, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_centred.svg', dpi=300, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_centred.pdf', dpi=300, transparent=True, bbox_inches='tight')
     plt.close()
 
 
@@ -316,9 +316,9 @@ def plot_centred_coverage_timeseries(time, smooth_coverage):
                           labelbottom=False, labeltop=False, labelleft=False, labelright=False)
     plt.gca().set_axis_off()
 
-    plt.savefig('coverage_individual.png', dpi=300, transparent=True, bbox_inches='tight')
-    plt.savefig('coverage_individual.svg', dpi=300, transparent=True, bbox_inches='tight')
-    plt.savefig('coverage_individual.pdf', dpi=300, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_individual.png', dpi=300, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_individual.svg', dpi=300, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_individual.pdf', dpi=300, transparent=True, bbox_inches='tight')
     plt.close()
 
 
@@ -399,9 +399,9 @@ def plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_co
     plt.text(date(2023, 1, 1), 0.53, f'Now', fontsize=24, va='bottom', ha='center', color=text_color)
     plt.text(date(2023, 1, 1), -0.53, f'Now', fontsize=24, va='top', ha='center', color=text_color)
 
-    plt.savefig('coverage_comparison_individual.png', dpi=300, transparent=True, bbox_inches='tight')
-    plt.savefig('coverage_comparison_individual.svg', dpi=300, transparent=True, bbox_inches='tight')
-    plt.savefig('coverage_comparison_individual.pdf', dpi=300, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_comparison_individual.png', dpi=300, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_comparison_individual.svg', dpi=300, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_comparison_individual.pdf', dpi=300, transparent=True, bbox_inches='tight')
     plt.close()
 
 

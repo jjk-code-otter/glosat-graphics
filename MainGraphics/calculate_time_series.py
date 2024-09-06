@@ -130,5 +130,6 @@ axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
 
 plt.gca().set_ylim(-2.4, 1.4)
 
-plt.savefig('long_time_series.png', bbox_inches='tight', dpi=300)
+plt.savefig(Path('OutputFigures') / 'long_time_series.png', bbox_inches='tight', dpi=300)
+plt.savefig(Path('OutputFigures') / 'long_time_series.svg', bbox_inches='tight')
 plt.close()

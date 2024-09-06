@@ -1,9 +1,10 @@
 import xarray as xa
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from pathlib import Path
 
 # Data from https://data.ceda.ac.uk/badc/ar6_wg1/data/ch_03/ch3_fig09/v20211028
-ds = xa.open_dataset('fig_3_9_b.nc')
+ds = xa.open_dataset('InputData/fig_3_9_b.nc')
 
 data_array = ds.tas.data
 
@@ -30,4 +31,4 @@ plt.gca().set_ylim(-1.3, 2.5)
 plt.gca().set_title("Global mean temperature 1850-2020", pad=5, loc='left', **hfont)
 axs.tick_params(axis='both', which='major', labelsize=20)
 
-plt.savefig('ipcc_3_9.svg', bbox_inches='tight')
+plt.savefig(Path('OutputFigures') / 'ipcc_3_9.svg', bbox_inches='tight')

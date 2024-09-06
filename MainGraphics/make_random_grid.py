@@ -1,6 +1,7 @@
 import itertools
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 from matplotlib.patches import Rectangle
 
@@ -41,6 +42,6 @@ axs.spines['top'].set_visible(False)
 axs.spines['right'].set_visible(False)
 axs.spines['bottom'].set_visible(False)
 axs.spines['left'].set_visible(False)
-plt.savefig('random_alpha_grid.svg', transparent=True)
-plt.savefig('random_alpha_grid.png', transparent=True)
+plt.savefig(Path('OutputFigures') / 'random_alpha_grid.svg', transparent=True)
+plt.savefig(Path('OutputFigures') / 'random_alpha_grid.png', transparent=True)
 plt.close()

@@ -12,7 +12,21 @@ import matplotlib.dates as mdates
 
 data_dir_env = os.getenv('DATADIR')
 glosat_dir = Path(data_dir_env) / 'GloSAT' / 'glosatref1000'
+glosat_diagnostic_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
 hadcrut_dir = Path(data_dir_env) / 'GloSAT' / 'hadcrut5'
+
+filename = f'GloSATref.1.0.0.0.analysis.component_series.global.monthly.nc'
+print(filename)
+ds = xa.open_dataset(glosat_diagnostic_dir / filename)
+data = ds.tas_mean
+uncertainty = ds.tas_total_unc
+df_data = data.to_dataframe(name='tas')
+df_data = df_data.rolling(window=12).mean()
+df_uncertainty = uncertainty.to_dataframe(name='tas_total_unc')
+df_uncertainty = df_uncertainty.rolling(window=12).mean()
+glosat = df_data.tas.array[:]
+glosat_unc = df_uncertainty.tas_total_unc.array[:]
+glosat_time = df_data.index.array
 
 areas = {
     'enso': [-180, -120, -5, 5],
@@ -109,10 +123,10 @@ for i in range(ntime):
 fig, axs = plt.subplots(1, 1)
 fig.set_size_inches(12, 4)
 
-plt.fill_between(hadcrut_time, hadcrut_globe_low, hadcrut_globe_high, color='black', alpha=0.2)
-plt.plot(hadcrut_time, hadcrut_globe, color="black")
+plt.fill_between(glosat_time, glosat - glosat_unc, glosat + glosat_unc, color='black', alpha=0.2)
+plt.plot(glosat_time, glosat, color="black")
 
-axs.spines['bottom'].set_position('zero')
+#axs.spines['bottom'].set_position('zero')
 axs.spines['right'].set_visible(False)
 axs.spines['top'].set_visible(False)
 axs.set_xlim([datetime.date(1870, 1, 1), datetime.date(2024, 12, 31)])
@@ -144,18 +158,19 @@ for key in la_nina_list:
 
 plt.gca().set_ylim(-1, 1.2)
 
-plt.savefig('globe.png', dpi=300, transparent=False, bbox_inches='tight')
+plt.savefig(Path('OutputFigures') / 'globe.png', dpi=300, transparent=False, bbox_inches='tight')
+plt.savefig(Path('OutputFigures') / 'globe.svg', dpi=300, transparent=False, bbox_inches='tight')
 plt.close()
 
 fig, axs = plt.subplots(1, 1)
 fig.set_size_inches(12, 4)
 
-# plt.fill_between(glosat_time, glosat_low, glosat_high, color="#1f77b4", alpha=0.2)
+#plt.fill_between(glosat_time, glosat - glosat_unc, glosat + glosat_unc, color="#1f77b4", alpha=0.2)
 plt.fill_between(hadcrut_time, hadcrut_low, hadcrut_high, color="#ff7f0e", alpha=0.1)
 plt.plot(hadcrut_time, hadcrut_mean, color="#ff7f0e", linewidth=0.5)
-# plt.plot(glosat_time, glosat_mean, color="#1f77b4", linewidth=0.5)
+#plt.plot(glosat_time, glosat, color="#1f77b4", linewidth=0.5)
 
-axs.spines['bottom'].set_position('zero')
+#axs.spines['bottom'].set_position('zero')
 axs.spines['right'].set_visible(False)
 axs.spines['top'].set_visible(False)
 axs.set_xlim([datetime.date(1870, 1, 1), datetime.date(2024, 12, 31)])
@@ -175,5 +190,6 @@ for key in volcanoes:
 
 plt.gca().set_ylim(-3.1, 3.1)
 
-plt.savefig('enso.png', dpi=300, transparent=False, bbox_inches='tight')
+plt.savefig(Path('OutputFigures') / 'enso.png', dpi=300, transparent=False, bbox_inches='tight')
+plt.savefig(Path('OutputFigures') / 'enso.svg', dpi=300, transparent=False, bbox_inches='tight')
 plt.close()

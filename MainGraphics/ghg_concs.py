@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 def read_annual_wdcgg(filename):
     years = []
@@ -66,13 +67,13 @@ def read_annual_law_dome(filename, variable):
     return years, values
 
 
-co2_years, co2, _ = read_annual_wdcgg('co2_annual_20231115.csv')
-ch4_years, ch4, _ = read_annual_wdcgg('ch4_annual_20231115.csv')
-n2o_years, n2o, _ = read_annual_wdcgg('n2o_annual_20231115.csv')
+co2_years, co2, _ = read_annual_wdcgg('InputData/co2_annual_20231115.csv')
+ch4_years, ch4, _ = read_annual_wdcgg('InputData/ch4_annual_20231115.csv')
+n2o_years, n2o, _ = read_annual_wdcgg('InputData/n2o_annual_20231115.csv')
 
-long_co2_years, long_co2 = read_annual_law_dome('grl21511-sup-0002-ts01.txt', 'co2')
-long_ch4_years, long_ch4 = read_annual_law_dome('grl21511-sup-0002-ts01.txt', 'ch4')
-long_n2o_years, long_n2o = read_annual_law_dome('grl21511-sup-0002-ts01.txt', 'n2o')
+long_co2_years, long_co2 = read_annual_law_dome('InputData/grl21511-sup-0002-ts01.txt', 'co2')
+long_ch4_years, long_ch4 = read_annual_law_dome('InputData/grl21511-sup-0002-ts01.txt', 'ch4')
+long_n2o_years, long_n2o = read_annual_law_dome('InputData/grl21511-sup-0002-ts01.txt', 'n2o')
 
 fig, axs = plt.subplots(3, 1)
 fig.set_size_inches(9, 9)
@@ -95,4 +96,4 @@ for i in range(3):
     axs[i].spines['top'].set_visible(False)
     axs[i].tick_params(axis='both', which='major', labelsize=12)
 
-plt.savefig('ghg_concs.svg', bbox_inches='tight')
+plt.savefig(Path('OutputFigures') / 'ghg_concs.svg', bbox_inches='tight')
