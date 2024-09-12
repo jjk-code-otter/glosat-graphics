@@ -1,3 +1,27 @@
+"""
+The timeline plotter requires a configuration file and a bunch of figures in the InputImages directory.
+
+The configuration file is a json file of a dictionary with four keys:
+
+start_year - the start year for the plot. Together with end_year these specify the extent of the x-axis
+end_year - the end year for the plot. Together with start_year these specify the extent of the x-axis
+labels - a list of lists. Each list member should be a list indicating:
+    Start year (int) for the label,
+    End year (int) for the label (can be set to null),
+    String (str) to print
+    (optional) offset (int). Sometimes the labels get a little crowded, so the offset can be used to move them by whole
+    numbers of years. Negative numbers move them earlier (left) and positive numbers move them later (right).
+images - a list of lists. Each list member should contain three elements:
+    Year (int) which indicates the point at which the mid point of the image will be plotted
+    null (null) just leave this null
+    Name of image (str). The image should be a filename of a file in the InputImages directory.
+
+Running this script will then generate the timeline. You can choose how many rows of images you want in the timeline
+by changing the n_rows keyword argument in the plot function. The fewer the rows, the larger the images, which can
+lead to crowding. Experiment with the number of rows. The images will always fit in the number of rows you specify, but
+the results won't always be pretty.
+
+"""
 import copy
 import json
 from pathlib import Path
@@ -31,6 +55,22 @@ def plot_it(n_things, shifted_things, new_lower_bound, new_upper_bound):
 
 
 def simple_stack(things, lower_bound, upper_bound):
+    """
+    The things are placed end to end starting at the lower_bound and continuing till we run out of things. This can end up with
+    things stacked past the upper bound.
+
+    :param things: ndarray(n_things, 2)
+        This will contain the things. The second axis can be any size as long as it's 2 or more. The [n,0] elements
+        are the mid points of the things and the [n,1] elements are the widths of the things.
+    :param lower_bound: float
+        The left hand edge of the container.
+    :param upper_bound:  float
+        The right hand edge of the container.
+    :return: (ndarray, float)
+        The ndarray will contain the shifted things that no longer overlap and the float will be the full width of
+        all the elements after shuffling from the left side of the leftmost object to the right edge of the rightmost
+        object.
+    """
     n_things = things.shape[0]
     shifted_things = copy.deepcopy(things)
 
@@ -49,6 +89,31 @@ def simple_stack(things, lower_bound, upper_bound):
 
 
 def remove_overlaps_with_limits(things, lower_bound, upper_bound):
+    """
+    Given some things in a ndarray(n_things, 2) specifying mid point and width for each of the things. The algorithm
+    will attempt to fit the things between the lower_bound and upper_bound specified. If there are too many things, to
+    fit between the bounds, then they will be returned as a simple stack.
+
+    If there is more than enough space to fit the things then the algorithm proceeds like so:
+    1. check if the left edge of the first thing is below the lower bound. If it is, move the thing so it is in bounds,
+       remove it from the list, reset the lower bound and recursively call the function on the remaining elements
+    2. check if the right edge of the last thing is above the upper bound. If it is, move the thing so it is in bounds,
+       remove it from the list, reset the upper bound and recursively call the function on the remaining elements
+    3. Go through each thing. If it overlaps with the next thing, then move the things apart so they are just touching.
+    4. Return to 1. until no more changes are made.
+
+    :param things: ndarray(n_things, 2)
+        This will contain the things. The second axis can be any size as long as it's 2 or more. The [n,0] elements
+        are the mid points of the things and the [n,1] elements are the widths of the things.
+    :param lower_bound: float
+        The left hand edge of the container.
+    :param upper_bound: float
+        The right hand edge of the container.
+    :return: (ndarray, float)
+        The ndarray will contain the shifted things that no longer overlap and the float will be the full width of
+        all the elements after shuffling from the left side of the leftmost object to the right edge of the rightmost
+        object.
+    """
     n_things = things.shape[0]
     shifted_things = copy.deepcopy(things)
     total_width = np.sum(things, axis=0)[1]
@@ -133,10 +198,22 @@ def remove_overlaps_with_limits(things, lower_bound, upper_bound):
 
 def remove_overlaps(things):
     """
-    Take array n x 2 containing object midpoint and width
+    Given some things in a ndarray(n_things, 2) specifying mid point and width for each of the things. The algorithm
+    will attempt to remove overlaps iteratively in a way that keeps the things as close to their original positions
+    as possible.
 
-    :param things:
-    :return:
+    The algorithm proceeds like so:
+    1. Go through each thing. If it overlaps with the next thing, then move the things apart - the left item moves
+       left and the righ item moves right - so they are just touching.
+    2. Return to 1. until no more changes are made.
+
+    :param things: ndarray(n_things, 2)
+        This will contain the things. The second axis can be any size as long as it's 2 or more. The [n,0] elements
+        are the mid points of the things and the [n,1] elements are the widths of the things.
+    :return: (ndarray, float)
+        The ndarray will contain the shifted things that no longer overlap and the float will be the full width of
+        all the elements after shuffling from the left side of the leftmost object to the right edge of the rightmost
+        object.
     """
 
     n_things = things.shape[0]
@@ -162,7 +239,7 @@ def remove_overlaps(things):
             if right_end > left_end:
                 diff = right_end - left_end
 
-                half_diff = max([diff / 2, 0.5])
+                half_diff = diff / 2
 
                 shifted_things[i, 0] = shifted_things[i, 0] - half_diff
                 shifted_things[i + 1, 0] = shifted_things[i + 1, 0] + half_diff
@@ -186,6 +263,13 @@ class Label():
     """
 
     def __init__(self, listicle):
+        """
+        Inititate with a list of 3 or 4 elements
+
+        :param listicle: List[int, int, str, int]
+            The listicle is a list containing the start_year, end_year, label text and an optional offset for when the
+            text is drawn.
+        """
         self.start = listicle[0]
         self.end = listicle[1]
         self.text = listicle[2]
@@ -207,7 +291,8 @@ class Label():
 
     def __add__(self, a):
         """
-        Adding two labels will add the text element together with a new-line character between elements
+        Adding two labels will add the text element together with a new-line character between elements. The end date
+        is set to the later of the two end dates.
 
         :param a: Label to be added
         :return: Label
@@ -224,6 +309,9 @@ class Label():
 
 
 class Timeline():
+    """
+    The main timeline class.
+    """
 
     def __init__(self):
         self.start_year = 1850
@@ -239,25 +327,30 @@ class Timeline():
 
             new_timeline = Timeline()
 
+            # Set the directory from the json file path
             new_timeline.dir = Path(filename).parents[0]
             new_timeline.start_year = metadata['start_year']
             new_timeline.end_year = metadata['end_year']
+
+            # Make a label object for each label in the configuration file
             new_timeline.labels = []
             for item in metadata['labels']:
                 new_timeline.labels.append(Label(item))
 
             new_timeline.images = metadata['images']
 
+            # Merge labels to avoid over printing
             new_timeline.merge_labels()
 
         return new_timeline
 
-    def merge_labels(self):
+    def merge_labels(self) -> None:
         """
-        If there are multiple labels with the same start date then combine them with a new line
-        separating the text items to avoid overwriting
+        If there are multiple labels with the same start date then these are combined into a single label. The text
+        elements are concatenated with a new-line character between them, which separates the text items to avoid
+        overwriting
 
-        :return:
+        :return: None
         """
         burner = copy.deepcopy(self.labels)
         new_labels = []
@@ -279,14 +372,29 @@ class Timeline():
 
     @staticmethod
     def plot_objects(ax, objects, objects_orig, images):
+        """
+        Plot the images at the locations specified by the shuffled objects. The original object locations are also
+        provided so that lines can be drawn connecting the image at its shuffled location with the poitn on the
+        timeline to which it corresponds.
+
+        :param ax: Axes
+            Matplotlibe axis for plotting on.
+        :param objects: ndarray
+            An (n, 2) ndarray
+        :param objects_orig:
+        :param images:
+        :return:
+        """
 
         full_plot_width = ax.get_xlim()
         plot_width = full_plot_width[1] - full_plot_width[0]
 
+        # Find the left edges and right edges and full width of the objects as arranged
         img_min = np.min(objects[:, 0] - objects[:, 1] / 2)
         img_max = np.max(objects[:, 0] + objects[:, 1] / 2)
         img_full_width = img_max - img_min
 
+        # For each of the objects extraxt the
         for i in range(objects.shape[0]):
             tx = objects[i, 0]
             ty1 = objects[i, 2]
@@ -296,12 +404,13 @@ class Timeline():
             x0 = tx - scaled_width / 2
             x1 = tx + scaled_width / 2
 
-            # If the images strip is wider than the whole width of the plot then scale down
+            # If the images strip is wider than the whole width of the plot then scale down.
             if img_full_width > plot_width:
                 offset = np.min(objects[:, 0] - objects[:, 1] / 2)
                 x0 = (x0 - offset) * plot_width / img_full_width + full_plot_width[0]
                 x1 = (x1 - offset) * plot_width / img_full_width + full_plot_width[0]
                 tx = (tx - offset) * plot_width / img_full_width + full_plot_width[0]
+            # if the image pokes out at either end, deal with it.
             elif img_min < full_plot_width[0]:
                 offset = img_min - full_plot_width[0]
                 x0 = x0 - offset
@@ -313,13 +422,18 @@ class Timeline():
                 x1 = x1 - offset
                 tx = tx - offset
 
+            # Plot the image
             ax.imshow(images[i], extent=[x0, x1, ty2, ty1], aspect='auto', zorder=100)
 
+            # Draw a line connecting the image at the midpoint of its upper edge to the time line. These will appear
+            # beneath the images.
             p = plt.plot(
                 [tx, objects_orig[i, 0], objects_orig[i, 0]],
                 [ty1, -10, 0],
                 linewidth=5
             )
+            # Draw a box around the image using whatever colour the line was drawn in. These will appear above the
+            # images.
             plt.plot(
                 [tx, x1, x1, x0, x0, tx],
                 [ty1, ty1, ty2, ty2, ty1, ty1],
@@ -327,6 +441,17 @@ class Timeline():
             )
 
     def sort_images(self, ax, n_rows):
+        """
+        Sort the images into n_rows and handle the image scaling into the appropriate coordinates.
+
+        :param ax: Axes
+            Matplotlibe axis on which the images and everything else will appear.
+        :param n_rows: int
+            Number of rows across which the images will be distributed.
+        :return: (List , List)
+            Returns two lists each with n_rows elements. Each of the elements contains an ndarray(n, 4) in size which
+            contains all the scaled images.
+        """
         high_image = True
 
         all_objects = []
@@ -388,6 +513,14 @@ class Timeline():
         return all_objects, all_images
 
     def plot_labels(self, ax):
+        """
+        Plot the labels on the provided axes
+
+        :param ax: Axes
+            Matplotlibe axes on which the labels will be plotted.
+        :return: None
+            Nowt
+        """
 
         for label in self.labels:
             # Set up the range one year for labels with no end date or as specified
@@ -407,6 +540,16 @@ class Timeline():
                                        color='green', edgecolor=None, alpha=0.5, linewidth=0))
 
     def plot_images(self, ax, n_rows):
+        """
+        Plot the images on the specified axes in n_rows rows.
+
+        :param ax: Axes
+            Matplotlib axes on which the images will be plotted.
+        :param n_rows: int
+            Number of rows of images to plot. don't use a negative number or zero, or kittens will die.
+        :return: None
+            Nothing
+        """
 
         # Sort the images into n_rows strips by iterating through them, transform axes, scale etc.
         objects_orig, images = self.sort_images(ax, n_rows)
@@ -423,6 +566,15 @@ class Timeline():
             Timeline.plot_objects(ax, objects[i], objects_orig[i], images[i])
 
     def plot(self, ax, n_rows=2):
+        """
+        Plot the timeline on the specified indices
+
+        :param ax: Axes
+            Matplotlib axes on which the timeline will be plotted
+        :param n_rows: int
+            Number of rows across which the images will tbe spread
+        :return:
+        """
         start_date = date(self.start_year, 1, 1)
         end_date = date(self.end_year, 1, 1)
 
@@ -446,9 +598,6 @@ if __name__ == '__main__':
     example = ''
 
     f = Timeline.from_json(f'InputImages/example{example}.json')
-
-    print(f.start_year)
-    print(f.end_year)
 
     fig, axs = plt.subplots(1, sharex=True)
     fig.set_size_inches(16, 10)

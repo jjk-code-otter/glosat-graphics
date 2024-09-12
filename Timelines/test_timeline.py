@@ -18,7 +18,6 @@ def test_overlap_bounds_two_objects():
     things[0, :] = np.array([0, 5])
     things[1, :] = np.array([20, 5])
     moved_objects, full_width = remove_overlaps_with_limits(things, 0, 20)
-    print(moved_objects)
 
 
 def test_overlap_bounds_four_objects():
@@ -28,8 +27,6 @@ def test_overlap_bounds_four_objects():
     things[2, :] = np.array([15, 5])
     things[3, :] = np.array([20, 5])
     moved_objects, full_width = remove_overlaps_with_limits(things, 0, 20.1)
-    print(moved_objects)
-
 
 
 def test_overlap_removal():
@@ -42,9 +39,6 @@ def test_overlap_removal():
 
     moved_objects, full_width = remove_overlaps(things)
 
-    print(moved_objects)
-    print(full_width)
-
     # Final object shouldn't move
     assert moved_objects[3, 0] == things[3, 0]
 
@@ -54,17 +48,11 @@ def test_overlap_removal():
 
 def test_overlap_removal_many_objects():
     n_objects = 20
-
     things = np.zeros((n_objects, 2))
-
     for i in range(n_objects):
         things[i, :] = np.array([i * 0.5, 4])
-
     moved_objects, full_width = remove_overlaps(things)
-    print(full_width)
-    print(moved_objects)
     # None of the objects should change size
     for i in range(things.shape[0]):
         assert moved_objects[i, 1] == things[i, 1]
-
     assert n_objects * 4 == pytest.approx(moved_objects[-1, 0] - moved_objects[0, 0] + 4, 0.0001)
