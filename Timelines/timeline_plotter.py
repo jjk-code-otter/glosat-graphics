@@ -35,6 +35,8 @@ from matplotlib.patches import Rectangle
 import numpy as np
 import os
 
+# If you want to watch what the algorithm does, you can change this to True. It breaks everything, but it's kind
+# of fun. It's probably not worth it.
 PLOT_DIAGNOSTICS = False
 
 
@@ -489,7 +491,7 @@ class Timeline():
             # Scale the transformed coordinates to the desired size (difference between ty1 and ty2
             full_y = 100
             max_y = -15
-            image_height_in_data = (full_y+max_y)/n_rows
+            image_height_in_data = (full_y + max_y) / n_rows
             scale = (points_data1[1] - points_data0[1]) / image_height_in_data
 
             # Set the location of the image. Alternate images are plotted high and low.
@@ -498,7 +500,8 @@ class Timeline():
 
             ypos = max_y - row_index * image_height_in_data
 
-            all_objects[row_index][all_counts[row_index],:] = np.array([tx, scaled_width, ypos, ypos - image_height_in_data])
+            all_objects[row_index][all_counts[row_index], :] = np.array(
+                [tx, scaled_width, ypos, ypos - image_height_in_data])
             all_images[row_index].append(img)
             all_counts[row_index] += 1
 
