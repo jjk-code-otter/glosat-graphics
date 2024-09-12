@@ -45,6 +45,8 @@ axs.spines['left'].set_color('#ffffff')
 axs.tick_params(axis='x', colors='#ffffff')
 axs.tick_params(axis='y', colors='#ffffff')
 
+axs.set_xlim(1749,2025)
+
 plt.savefig(Path('OutputFigures') / 'sunspots.png', bbox_inches='tight', dpi=600, transparent=True)
 plt.savefig(Path('OutputFigures') / 'sunspots.svg', bbox_inches='tight', dpi=600, transparent=True)
 plt.close()

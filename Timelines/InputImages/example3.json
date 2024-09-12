@@ -23,23 +23,14 @@
     [2012, null, "Loss of AATSR"]
   ],
   "images": [
-    [1850, null, "oldboat.png"],
-    [1875, null, "oldboat2.png"],
-    [1895, null, "oldboat3.png"],
-    [1905, null, "oldboat4.png"],
-    [1920, null, "oldboat5.png"],
-    [1939, null, "oldboat6.png"],
-    [1945, null, "oldboat7.png"],
-
-    [1973, null, "oldboat8.png"],
-    [1979, null, "oldboat9.png"],
-    [1979, null, "oldboat10.png"],
-    [1985, null, "oldboat11.png"],
-    [1991, null, "oldboat12.png"],
-    [2002, null, "oldboat13.png"],
-    [2005, null, "oldboat14.png"],
-    [2010, null, "oldboat15.png"],
-    [2010, null, "oldboat16.png"],
-    [2015, null, "oldboat17.png"]
+    [1850, null, "example.png"],
+    [1875, null, "example2.png"],
+    [1920, null, "example3.png"],
+    [1949, null, "example4.png"],
+    [1985, null, "example5.png"],
+    [1991, null, "example6.png"],
+    [2010, null, "example7.png"],
+    [2011, null, "example8.png"],
+    [2015, null, "example9.png"]
   ]
 }
