@@ -19,7 +19,7 @@
     [2001, null, "TAO/TRITON"],
     [2002, null, "AMSR-E (microwave SST)"],
     [2005, null, "Drifter array complete"],
-    [2007, null, "Loss of ICOADS callsigns"],
+    [2007, null, "Loss of ICOADS callsigns", 1],
     [2012, null, "Loss of AATSR"]
   ],
   "images": [

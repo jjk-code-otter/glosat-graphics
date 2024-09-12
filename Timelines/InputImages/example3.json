@@ -15,11 +15,11 @@
     [1979, null, "Drifting buoys"],
     [1985, null, "TAO moorings"],
     [1991, null, "ATSR (dual view SST)"],
-    [1999, null, "PIRATA morrings"],
-    [2001, null, "TAO/TRITON"],
+    [1999, null, "PIRATA morrings", -2],
+    [2001, null, "TAO/TRITON", -1],
     [2002, null, "AMSR-E (microwave SST)"],
     [2005, null, "Drifter array complete"],
-    [2007, null, "Loss of ICOADS callsigns"],
+    [2007, null, "Loss of ICOADS callsigns", 1],
     [2012, null, "Loss of AATSR"]
   ],
   "images": [

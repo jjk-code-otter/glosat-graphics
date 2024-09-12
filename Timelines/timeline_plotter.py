@@ -326,14 +326,19 @@ class Timeline():
                 linewidth=5, zorder=200, color=p[-1].get_color()
             )
 
-    def sort_images(self, ax):
+    def sort_images(self, ax, n_rows):
         high_image = True
-        hi_objects = np.zeros((len(self.images), 4))
-        lo_objects = np.zeros((len(self.images), 4))
-        hi_images = []
-        lo_images = []
-        hi_count = 0
-        lo_count = 0
+
+        all_objects = []
+        all_images = []
+        all_counts = []
+
+        for i in range(n_rows):
+            all_objects.append(np.zeros((len(self.images), 4)))
+            all_images.append([])
+            all_counts.append(0)
+
+        row_index = 0
 
         for label in self.images:
             year1 = label[0]
@@ -357,27 +362,30 @@ class Timeline():
             points_data1 = axis_to_data.transform((width, 1))
 
             # Scale the transformed coordinates to the desired size (difference between ty1 and ty2
-            image_height_in_data = 35.
+            full_y = 100
+            max_y = -15
+            image_height_in_data = (full_y+max_y)/n_rows
             scale = (points_data1[1] - points_data0[1]) / image_height_in_data
 
             # Set the location of the image. Alternate images are plotted high and low.
             scaled_width = (points_data1[0] - points_data0[0]) / scale
             tx = mpl.dates.date2num(date(year1, 1, 1))
-            if high_image:
-                high_image = False
-                hi_objects[hi_count, :] = np.array([tx, scaled_width, -55, -55 - image_height_in_data])
-                hi_images.append(img)
-                hi_count += 1
-            else:
-                high_image = True
-                lo_objects[lo_count, :] = np.array([tx, scaled_width, -15, -15 - image_height_in_data])
-                lo_images.append(img)
-                lo_count += 1
 
-        hi_objects_orig = hi_objects[0:hi_count, :]
-        lo_objects_orig = lo_objects[0:lo_count, :]
+            ypos = max_y - row_index * image_height_in_data
 
-        return hi_objects_orig, lo_objects_orig, hi_images, lo_images
+            all_objects[row_index][all_counts[row_index],:] = np.array([tx, scaled_width, ypos, ypos - image_height_in_data])
+            all_images[row_index].append(img)
+            all_counts[row_index] += 1
+
+            row_index += 1
+            if row_index == n_rows:
+                row_index = 0
+
+        # Snip out any bits of the arrays we don't need
+        for row_index in range(n_rows):
+            all_objects[row_index] = all_objects[row_index][0:all_counts[row_index]]
+
+        return all_objects, all_images
 
     def plot_labels(self, ax):
 
@@ -389,7 +397,6 @@ class Timeline():
                 tx2 = mpl.dates.date2num(date(label.end, 12, 31))
 
             # plot the text
-            # ax.text((tx + tx2) / 2, 32, label.text, rotation=45)
             tx_with_offset = mpl.dates.date2num(date(label.start + label.offset, 1, 1))
             ax.text(tx_with_offset, 32, label.text, rotation=45)
 
@@ -401,17 +408,19 @@ class Timeline():
 
     def plot_images(self, ax, n_rows):
 
-        # Sort the images into two strips by alternating high and low, transform axes, scale etc.
-        high_objects_orig, low_objects_orig, high_images, low_images = self.sort_images(ax)
+        # Sort the images into n_rows strips by iterating through them, transform axes, scale etc.
+        objects_orig, images = self.sort_images(ax, n_rows)
 
-        # Jiggle the images so that they don't overlap
+        # Jiggle the images in each strip so that they don't overlap
         fpw = ax.get_xlim()
-        high_objects, high_full_width = remove_overlaps_with_limits(high_objects_orig, fpw[0], fpw[1])
-        low_objects, low_full_width = remove_overlaps_with_limits(low_objects_orig, fpw[0], fpw[1])
+        objects = []
+        for i in range(n_rows):
+            sorted_objects, _ = remove_overlaps_with_limits(objects_orig[i], fpw[0], fpw[1])
+            objects.append(sorted_objects)
 
-        # Now plot it all out
-        Timeline.plot_objects(ax, high_objects, high_objects_orig, high_images)
-        Timeline.plot_objects(ax, low_objects, low_objects_orig, low_images)
+        # Now plot each strip out
+        for i in range(n_rows):
+            Timeline.plot_objects(ax, objects[i], objects_orig[i], images[i])
 
     def plot(self, ax, n_rows=2):
         start_date = date(self.start_year, 1, 1)
@@ -434,16 +443,18 @@ class Timeline():
 
 
 if __name__ == '__main__':
-    f = Timeline.from_json('InputImages/example.json')
+    example = ''
+
+    f = Timeline.from_json(f'InputImages/example{example}.json')
 
     print(f.start_year)
     print(f.end_year)
 
     fig, axs = plt.subplots(1, sharex=True)
-    fig.set_size_inches(16, 8)
+    fig.set_size_inches(16, 10)
 
-    f.plot(axs, n_rows=1)
+    f.plot(axs, n_rows=3)
 
-    plt.savefig('OutputFigures/time_line.svg')
-    plt.savefig('OutputFigures/time_line.png', bbox_inches="tight", dpi=300)
+    plt.savefig(f'OutputFigures/time_line{example}.svg')
+    plt.savefig(f'OutputFigures/time_line{example}.png', bbox_inches="tight", dpi=300)
     plt.close()
