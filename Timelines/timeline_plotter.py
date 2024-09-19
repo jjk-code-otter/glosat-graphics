@@ -1,6 +1,10 @@
 """
 The timeline plotter requires a configuration file and a bunch of figures in the InputImages directory.
 
+Run like so:
+
+python timeline_plotter.py -c InputImages/example.json -o OutputFigures/time_line.png -r 3
+
 The configuration file is a json file of a dictionary with four keys:
 
 start_year - the start year for the plot. Together with end_year these specify the extent of the x-axis
@@ -13,17 +17,20 @@ labels - a list of lists. Each list member should be a list indicating:
     numbers of years. Negative numbers move them earlier (left) and positive numbers move them later (right).
 images - a list of lists. Each list member should contain three elements:
     Year (int) which indicates the point at which the mid point of the image will be plotted
-    null (null) just leave this null
-    Name of image (str). The image should be a filename of a file in the InputImages directory.
+    Offset (float or null) Allows manual placing of each image. If a value (in years) is given then the image will
+    be offset by that number of years. This will override shuffling to fit, but there may still be some automatic
+    adjustment to make sure images are within the plot boundaries. If all values are set to null then the script will
+    attempt to fit the images by adjusting their locations automatically
+    Name of image (str). The image should be a filename of a file in the same directory as the json configuration file.
 
 Running this script will then generate the timeline. You can choose how many rows of images you want in the timeline
 by changing the n_rows keyword argument in the plot function. The fewer the rows, the larger the images, which can
 lead to crowding. Experiment with the number of rows. The images will always fit in the number of rows you specify, but
 the results won't always be pretty.
-
 """
 import copy
 import json
+from argparse import ArgumentParser
 from pathlib import Path
 from datetime import date
 import matplotlib.pyplot as plt
@@ -41,6 +48,19 @@ PLOT_DIAGNOSTICS = False
 
 
 def plot_it(n_things, shifted_things, new_lower_bound, new_upper_bound):
+    """
+    Plot out some simple diagnostics that show the locations of each image and the upper and lower bounds.
+
+    :param n_things: int
+        number of things being fitted
+    :param shifted_things:  ndarray
+        Array (n,2) containing the midpoints [:, 0] and widths [:, 1] of the items being fitted
+    :param new_lower_bound: float
+        Lower edge of the container into which the tings are being fitted
+    :param new_upper_bound:  float
+        Upper edge of the container into which the tings are being fitted
+    :return: None
+    """
     if not PLOT_DIAGNOSTICS:
         return
 
@@ -54,6 +74,26 @@ def plot_it(n_things, shifted_things, new_lower_bound, new_upper_bound):
     plt.plot([new_upper_bound, new_upper_bound], [0, n_things * 10])
     plt.show()
     plt.close()
+
+
+def parse_list(in_list):
+    """
+    Take a list which is all Nones or a mix of floats and Nones. If it is all Nones return the original list
+    if it is a mixture, replace Nones with zeros.
+
+    :param in_list:
+    :return:
+    """
+    all_none = True
+    for element in in_list:
+        if element is not None:
+            all_none = False
+    if not all_none:
+        out_list = [0.0 if x is None else x for x in in_list]
+    else:
+        out_list = in_list
+
+    return out_list
 
 
 def simple_stack(things, lower_bound, upper_bound):
@@ -82,10 +122,23 @@ def simple_stack(things, lower_bound, upper_bound):
         shifted_things[i, 0] = left_side + shifted_things[i, 1] / 2.
         left_side = left_side + shifted_things[i, 1]
 
-    full_width = (
-            np.max(shifted_things[:, 0] + shifted_things[:, 1] / 2) -
-            np.min(shifted_things[:, 0] - shifted_things[:, 1] / 2)
-    )
+    full_width = calculate_full_width(shifted_things)
+
+    return shifted_things, full_width
+
+
+def calculate_full_width(things):
+    return (np.max(things[:, 0] + things[:, 1] / 2) - np.min(things[:, 0] - things[:, 1] / 2))
+
+
+def use_offsets(things, offsets):
+    n_things = things.shape[0]
+    shifted_things = copy.deepcopy(things)
+
+    for i in range(n_things):
+        shifted_things[i, 0] = things[i, 0] + offsets[i]
+
+    full_width = calculate_full_width(shifted_things)
 
     return shifted_things, full_width
 
@@ -187,10 +240,7 @@ def remove_overlaps_with_limits(things, lower_bound, upper_bound):
 
             plot_it(n_things, shifted_things, new_lower_bound, new_upper_bound)
 
-        full_width = (
-                np.max(shifted_things[:, 0] + shifted_things[:, 1] / 2) -
-                np.min(shifted_things[:, 0] - shifted_things[:, 1] / 2)
-        )
+        full_width = calculate_full_width(shifted_things)
 
         if iterations > 1500:
             return shifted_things, full_width
@@ -248,10 +298,7 @@ def remove_overlaps(things):
 
                 shift = True
 
-        full_width = (
-                np.max(shifted_things[:, 0] + shifted_things[:, 1] / 2) -
-                np.min(shifted_things[:, 0] - shifted_things[:, 1] / 2)
-        )
+        full_width = calculate_full_width(shifted_things)
 
         if iterations > 500:
             return shifted_things, full_width
@@ -261,22 +308,22 @@ def remove_overlaps(things):
 
 class Label():
     """
-    Simple Label class to handle combination, sorting and comparison of labels
+    Simple Label class to handle combination and comparison of labels
     """
 
-    def __init__(self, listicle):
+    def __init__(self, input_list):
         """
         Inititate with a list of 3 or 4 elements
 
-        :param listicle: List[int, int, str, int]
+        :param input_list: List[int, int, str, int]
             The listicle is a list containing the start_year, end_year, label text and an optional offset for when the
             text is drawn.
         """
-        self.start = listicle[0]
-        self.end = listicle[1]
-        self.text = listicle[2]
-        if len(listicle) == 4:
-            self.offset = listicle[3]
+        self.start = input_list[0]
+        self.end = input_list[1]
+        self.text = input_list[2]
+        if len(input_list) == 4:
+            self.offset = input_list[3]
         else:
             self.offset = 0
 
@@ -354,9 +401,15 @@ class Timeline():
 
         :return: None
         """
+
         burner = copy.deepcopy(self.labels)
         new_labels = []
+
+        # As long as there are labels left in the burner copy
         while len(burner) > 0:
+
+            # Pop a label off the end of the list then iterate through the remaining items and look for matches.
+            # If there are matches, combine the labels and add the later label to the remove list
             label1 = burner.pop()
             to_remove = []
             for label2 in burner:
@@ -364,6 +417,7 @@ class Timeline():
                     label1 = label1 + label2
                     to_remove.append(label2)
 
+            # If there were matches then remove any labels on the "to remove" list.
             if len(to_remove) > 0:
                 for r in to_remove:
                     burner.remove(r)
@@ -396,7 +450,7 @@ class Timeline():
         img_max = np.max(objects[:, 0] + objects[:, 1] / 2)
         img_full_width = img_max - img_min
 
-        # For each of the objects extraxt the
+        # For each of the objects extract the
         for i in range(objects.shape[0]):
             tx = objects[i, 0]
             ty1 = objects[i, 2]
@@ -457,6 +511,7 @@ class Timeline():
         high_image = True
 
         all_objects = []
+        all_offsets = []
         all_images = []
         all_counts = []
 
@@ -464,11 +519,13 @@ class Timeline():
             all_objects.append(np.zeros((len(self.images), 4)))
             all_images.append([])
             all_counts.append(0)
+            all_offsets.append([])
 
         row_index = 0
 
         for label in self.images:
             year1 = label[0]
+            offset = label[1]
             tag = label[2]
 
             img = Image.open(self.dir / tag)
@@ -503,6 +560,13 @@ class Timeline():
             all_objects[row_index][all_counts[row_index], :] = np.array(
                 [tx, scaled_width, ypos, ypos - image_height_in_data])
             all_images[row_index].append(img)
+            if offset is not None:
+                all_offsets[row_index].append(
+                    mpl.dates.date2num(date(year1 + offset, 1, 1)) -
+                    mpl.dates.date2num(date(year1, 1, 1))
+                )
+            else:
+                all_offsets[row_index].append(offset)
             all_counts[row_index] += 1
 
             row_index += 1
@@ -513,7 +577,10 @@ class Timeline():
         for row_index in range(n_rows):
             all_objects[row_index] = all_objects[row_index][0:all_counts[row_index]]
 
-        return all_objects, all_images
+        # Check whether there are any non-none offsets and replace Nones with zeros
+        all_offsets = [parse_list(x) for x in all_offsets]
+
+        return all_objects, all_images, all_offsets
 
     def plot_labels(self, ax):
         """
@@ -555,13 +622,16 @@ class Timeline():
         """
 
         # Sort the images into n_rows strips by iterating through them, transform axes, scale etc.
-        objects_orig, images = self.sort_images(ax, n_rows)
+        objects_orig, images, offsets = self.sort_images(ax, n_rows)
 
         # Jiggle the images in each strip so that they don't overlap
         fpw = ax.get_xlim()
         objects = []
         for i in range(n_rows):
-            sorted_objects, _ = remove_overlaps_with_limits(objects_orig[i], fpw[0], fpw[1])
+            if None in offsets[i]:
+                sorted_objects, _ = remove_overlaps_with_limits(objects_orig[i], fpw[0], fpw[1])
+            else:
+                sorted_objects, _ = use_offsets(objects_orig[i], offsets[i])
             objects.append(sorted_objects)
 
         # Now plot each strip out
@@ -598,15 +668,19 @@ class Timeline():
 
 
 if __name__ == '__main__':
-    example = ''
+    parser = ArgumentParser()
+    parser.add_argument("-c", "--configuration", help="Configuration file", required=True, type=str, dest='config_file')
+    parser.add_argument("-o", "--output", help="Output file", required=True, type=str, dest='output_file')
+    parser.add_argument("-r", "--rows", help="Number of rows of images in output image", default=2, type=int, dest='n_rows')
 
-    f = Timeline.from_json(f'InputImages/example{example}.json')
+    args = parser.parse_args()
+
+    f = Timeline.from_json(args.config_file)
 
     fig, axs = plt.subplots(1, sharex=True)
     fig.set_size_inches(16, 10)
 
-    f.plot(axs, n_rows=3)
+    f.plot(axs, n_rows=args.n_rows)
 
-    plt.savefig(f'OutputFigures/time_line{example}.svg')
-    plt.savefig(f'OutputFigures/time_line{example}.png', bbox_inches="tight", dpi=300)
+    plt.savefig(args.output_file, bbox_inches="tight", dpi=300)
     plt.close()

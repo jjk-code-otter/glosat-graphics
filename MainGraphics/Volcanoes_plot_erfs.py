@@ -1,32 +1,48 @@
 import matplotlib.pyplot as plt
 
-solar_years = []
-solar_erf = []
 
-with open('InputData/solar_erf.csv', 'r') as f:
-    f.readline()
-    for line in f:
-        columns = line.split(',')
+def read_timeseries_file(filename):
+    solar_years = []
+    solar_erf = []
+    solar_zero = []
 
-        year = int(columns[0])
-        if year >= 1750 and year <= 2023:
-            solar_years.append(year)
-            solar_erf.append(float(columns[1]))
+    with open(filename, 'r') as f:
+        f.readline()
+        for line in f:
+            columns = line.split(',')
 
-volcanic_years = []
-volcanic_erf = []
-volcanic_zero = []
+            year = int(columns[0])
+            if year >= 1750 and year <= 2023:
+                solar_years.append(year)
+                solar_erf.append(float(columns[1]))
+                solar_zero.append(0.5)
 
-with open('InputData/volcanic_erf.csv', 'r') as f:
-    f.readline()
-    for line in f:
-        columns = line.split(',')
+    return solar_years, solar_erf, solar_zero
 
-        year = int(columns[0])
-        if year >= 1750 and year <= 2023:
-            volcanic_years.append(year)
-            volcanic_erf.append(float(columns[1]))
-            volcanic_zero.append(0.5)
+
+# ERF files provided by Andrew Schurer
+solar_years, solar_erf, _ = read_timeseries_file('InputData/solar_erf.csv')
+volcanic_years, volcanic_erf, volcanic_zero = read_timeseries_file('InputData/volcanic_erf.csv')
+
+
+def get_volcanoes():
+    volcanoes = {
+        'pinatubo': 1991,
+        'chichon': 1982,
+        'agung': 1963,
+        'krakatoa': 1883,
+        'santamaria': 1902,
+        'hthh': 2022,
+        'consiguina': 1835,
+        'unknown2': 1831,
+        'galunggung': 1822,
+        'tambora': 1815,
+        'unknown': 1808,
+        'laki': 1783
+    }
+    return volcanoes
+
+
 fig, axs = plt.subplots(1, 1)
 fig.set_size_inches(18, 6)
 
@@ -44,7 +60,7 @@ axs.spines['left'].set_color('#ffffff')
 axs.tick_params(axis='x', colors='#ffffff')
 axs.tick_params(axis='y', colors='#ffffff')
 
-axs.set_xlim(1749,2025)
+axs.set_xlim(1749, 2025)
 
 plt.savefig('OutputFigures/solar_erf.svg', transparent=True, bbox_inches='tight')
 plt.close()
@@ -68,26 +84,11 @@ axs.spines['left'].set_color('#555555')
 axs.tick_params(axis='x', colors='#555555')
 axs.tick_params(axis='y', colors='#555555')
 
-plt.gca().set_ylim(-6,0.5)
+plt.gca().set_ylim(-6, 0.5)
 
-volcanoes = {
-'pinatubo': 1991,
-'chichon': 1982,
-'agung':  1963,
-'krakatoa': 1883,
-'santamaria': 1902,
-'hthh': 2022,
-'consiguina': 1835,
-'unknown2': 1831,
-'galunggung': 1822,
-'tambora': 1815,
-'unknown': 1808,
-'laki': 1783
-}
-
+volcanoes = get_volcanoes()
 for v in volcanoes:
-    plt.plot([volcanoes[v], volcanoes[v]], [-4.8,-5], color='#eeeeee')
-
+    plt.plot([volcanoes[v], volcanoes[v]], [-4.8, -5], color='#eeeeee')
 
 plt.gca().invert_yaxis()
 

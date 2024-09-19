@@ -1,8 +1,8 @@
 import xarray as xr
 import numpy as np
-#import matplotlib.pyplot as plt
-#import cartopy.crs as ccrs
-#import cartopy.feature as cfeature
+# import matplotlib.pyplot as plt
+# import cartopy.crs as ccrs
+# import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -18,11 +18,10 @@ ax.coastlines(linewidth=3)
 plt.savefig(Path('OutputFigures') / 'pacific_ocean.png', bbox_inches='tight', dpi=1200)
 plt.close()
 
-
 data_dir_env = Path(os.getenv('DATADIR'))
 
 # Load the HadISST NetCDF dataset
-file_path = data_dir_env / 'ManagedData' / 'Data' / 'HadISST' / 'HadISST_sst.nc'  # Replace with your file path
+file_path = data_dir_env / 'ManagedData' / 'Data' / 'HadISST' / 'HadISST_sst.nc'
 ds = xr.open_dataset(file_path)
 
 # Select the SST variable
@@ -63,10 +62,7 @@ ax = plt.axes(projection=ccrs.PlateCarree(central_longitude=180))
 lon, lat = np.meshgrid(el_nino_composite.longitude, el_nino_composite.latitude)
 pcm = ax.pcolormesh(lon, lat, el_nino_composite, transform=ccrs.PlateCarree(),
                     cmap='RdBu_r', shading='auto', vmin=-1.5, vmax=1.5)
-#contour = el_nino_composite.plot.contourf(
-#    ax=ax, transform=ccrs.PlateCarree(), levels=np.arange(-2, 2.5, 0.5),
-#    cmap='RdBu_r', extend='both', cbar_kwargs={'label': 'SST Anomaly (°C)'}
-#)
+
 ax.set_extent([110, 300, -60, 60], crs=ccrs.PlateCarree())
 ax.coastlines(zorder=2, linewidth=3)
 ax.add_feature(cfeature.LAND, facecolor='0.5', zorder=1)  # Redraw land on top
@@ -79,13 +75,9 @@ ax = plt.axes(projection=ccrs.PlateCarree(central_longitude=180))
 lon, lat = np.meshgrid(el_nino_composite.longitude, el_nino_composite.latitude)
 pcm = ax.pcolormesh(lon, lat, la_nina_composite, transform=ccrs.PlateCarree(),
                     cmap='RdBu_r', shading='auto', vmin=-1.5, vmax=1.5)
-# contour = la_nina_composite.plot.contourf(
-#     ax=ax, transform=ccrs.PlateCarree(), levels=np.arange(-2, 2.5, 0.5),
-#     cmap='RdBu_r', extend='both', cbar_kwargs={'label': 'SST Anomaly (°C)'}
-# )
+
 ax.set_extent([110, 300, -60, 60], crs=ccrs.PlateCarree())
 ax.coastlines(zorder=2, linewidth=3)
 ax.add_feature(cfeature.LAND, facecolor='0.5', zorder=1)  # Redraw land on top
 plt.savefig(Path('OutputFigures') / 'pacific_ocean_nina_composite.png', bbox_inches='tight', dpi=1200)
 plt.close()
-

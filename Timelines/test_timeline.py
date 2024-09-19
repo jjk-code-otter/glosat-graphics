@@ -1,6 +1,36 @@
 import pytest
 import numpy as np
-from Timelines.timeline_plotter import remove_overlaps, remove_overlaps_with_limits
+from Timelines.timeline_plotter import remove_overlaps, remove_overlaps_with_limits, parse_list
+
+
+def test_parse_list_all_none():
+    test_list = [None, None, None]
+    return_list = parse_list(test_list)
+    for item in return_list:
+        assert item is None
+
+
+def test_parse_list_one_zero():
+    test_list = [None, 0.0, None]
+    return_list = parse_list(test_list)
+    for item in return_list:
+        assert item == 0.0
+
+
+def test_parse_list_one_non_none():
+    test_list = [None, 2.0, None]
+    return_list = parse_list(test_list)
+    expected_list = [0, 2, 0]
+    for i in range(3):
+        assert return_list[i] == expected_list[i]
+
+
+def test_parse_list_all_numbers():
+    test_list = [1, 2, 3]
+    return_list = parse_list(test_list)
+
+    for i in range(3):
+        assert test_list[i] == return_list[i]
 
 
 def test_overlap_bounds_overfull():
@@ -23,7 +53,7 @@ def test_overlap_bounds_two_objects():
 def test_overlap_bounds_four_objects():
     things = np.zeros((4, 2))
     things[0, :] = np.array([3, 5])
-    things[1, :] = np.array([10,5])
+    things[1, :] = np.array([10, 5])
     things[2, :] = np.array([15, 5])
     things[3, :] = np.array([20, 5])
     moved_objects, full_width = remove_overlaps_with_limits(things, 0, 20.1)
@@ -45,6 +75,7 @@ def test_overlap_removal():
     # None of the objects should change size
     for i in range(things.shape[0]):
         assert moved_objects[i, 1] == things[i, 1]
+
 
 def test_overlap_removal_many_objects():
     n_objects = 20

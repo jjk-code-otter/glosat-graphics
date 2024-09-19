@@ -31,24 +31,9 @@ def plot_map(inarry, filename):
 
     fig = plt.figure(figsize=(16, 9))
     ax = fig.add_subplot(111, projection=proj, aspect='auto')
-    # p = ax.contourf(wrap_lon, data.latitude, wrap_data[:, :],
-    #                 transform=ccrs.PlateCarree(),
-    #                 levels=wmo_levels,
-    #                 colors=wmo_cols,
-    #                 extend='none'
-    #                 )
 
     p = ax.pcolormesh(wrap_lon, data.latitude, wrap_data[:, :], shading='auto', transform=ccrs.PlateCarree(),
                       cmap=mpl.cm.Purples, vmin=-0.3, vmax=1.7)
-
-    # cbar = plt.colorbar(p, orientation='horizontal', fraction=0.06, pad=0.04)
-
-    # cbar.ax.tick_params(labelsize=15)
-    # cbar.set_ticks(wmo_levels)
-    # cbar.set_ticklabels(wmo_levels)
-
-    # label_text = f"Temperature difference from"
-    # cbar.set_label(label_text, rotation=0, fontsize=15)
 
     p.axes.coastlines(color='#222222', linewidth=2)
     p.axes.set_global()
@@ -253,8 +238,7 @@ def plot_non_centred_coverage_timeseries(time, smooth_coverage):
     fig, axs = plt.subplots(1, 1)
     fig.set_size_inches(12, 3)
 
-    plt.fill_between(time, smooth_coverage[:, 6],
-                     0.0 - smooth_coverage[:, 4] - smooth_coverage[:, 5] - smooth_coverage[:, 6], color=spole)
+    plt.fill_between(time, smooth_coverage[:, 6], 0.0 - smooth_coverage[:, 4] - smooth_coverage[:, 5] - smooth_coverage[:, 6], color=spole)
     plt.fill_between(time, smooth_coverage[:, 6], 0.0 - smooth_coverage[:, 4] - smooth_coverage[:, 5], color=sh_extra)
     plt.fill_between(time, smooth_coverage[:, 6], 0.0 - smooth_coverage[:, 4], color=tropics)
 
@@ -263,13 +247,14 @@ def plot_non_centred_coverage_timeseries(time, smooth_coverage):
     plt.fill_between(time, smooth_coverage[:, 6], smooth_coverage[:, 3] + smooth_coverage[:, 2], color=nh_extra)
     plt.fill_between(time, smooth_coverage[:, 6], smooth_coverage[:, 3], color=tropics)
 
-    plt.plot(time, np.zeros(ntime) + polar_area - 0.50, color='black', alpha=0.5)
-    plt.plot(time, np.zeros(ntime) + 0.50, color='black', alpha=0.5)
-    plt.plot(time, np.zeros(ntime) + 0.25, color='black', alpha=0.5)
-    plt.plot(time, np.zeros(ntime) + 0.00, color='black', alpha=0.5)
-    plt.plot(time, np.zeros(ntime) - 0.25, color='black', alpha=0.5)
-    plt.plot(time, np.zeros(ntime) - 0.50, color='black', alpha=0.5)
-    plt.plot(time, np.zeros(ntime) - polar_area + 0.50, color='black', alpha=0.5)
+    nz = np.zeros(ntime)
+    plt.plot(time, nz + polar_area - 0.50, color='black', alpha=0.5)
+    plt.plot(time, nz + 0.50, color='black', alpha=0.5)
+    plt.plot(time, nz + 0.25, color='black', alpha=0.5)
+    plt.plot(time, nz + 0.00, color='black', alpha=0.5)
+    plt.plot(time, nz - 0.25, color='black', alpha=0.5)
+    plt.plot(time, nz - 0.50, color='black', alpha=0.5)
+    plt.plot(time, nz - polar_area + 0.50, color='black', alpha=0.5)
 
     plt.gca().tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False,
                           labelbottom=False, labeltop=False, labelleft=False, labelright=False)
@@ -292,25 +277,22 @@ def plot_centred_coverage_timeseries(time, smooth_coverage):
     fig, axs = plt.subplots(1, 1)
     fig.set_size_inches(24, 4)
 
-    plt.fill_between(time, np.zeros(ntime) - polar_area + 0.50,
-                     np.zeros(ntime) - polar_area + 0.50 - smooth_coverage[:, 6],
-                     color=spole)
-    plt.fill_between(time, np.zeros(ntime) - 0.25, np.zeros(ntime) - 0.25 - smooth_coverage[:, 5], color=sh_extra)
-    plt.fill_between(time, np.zeros(ntime), 0.0 - smooth_coverage[:, 4], color=tropics)
+    nz = np.zeros(ntime)
+    plt.fill_between(time, nz - polar_area + 0.50, nz - polar_area + 0.50 - smooth_coverage[:, 6], color=spole)
+    plt.fill_between(time, nz - 0.25, nz - 0.25 - smooth_coverage[:, 5], color=sh_extra)
+    plt.fill_between(time, nz, 0.0 - smooth_coverage[:, 4], color=tropics)
 
-    plt.fill_between(time, np.zeros(ntime) + polar_area - 0.5,
-                     np.zeros(ntime) + polar_area - 0.5 + smooth_coverage[:, 1],
-                     color=npole)
-    plt.fill_between(time, np.zeros(ntime) + 0.25, np.zeros(ntime) + 0.25 + smooth_coverage[:, 2], color=nh_extra)
-    plt.fill_between(time, np.zeros(ntime), smooth_coverage[:, 3], color=tropics)
+    plt.fill_between(time, nz + polar_area - 0.5, nz + polar_area - 0.5 + smooth_coverage[:, 1], color=npole)
+    plt.fill_between(time, nz + 0.25, nz + 0.25 + smooth_coverage[:, 2], color=nh_extra)
+    plt.fill_between(time, nz, smooth_coverage[:, 3], color=tropics)
 
-    plt.plot(time, np.zeros(ntime) + polar_area - 0.50, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) + 0.50, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) + 0.25, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) + 0.00, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) - 0.25, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) - 0.50, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) - polar_area + 0.50, color='black', linewidth=0.5)
+    plt.plot(time, nz + polar_area - 0.50, color='black', linewidth=0.5)
+    plt.plot(time, nz + 0.50, color='black', linewidth=0.5)
+    plt.plot(time, nz + 0.25, color='black', linewidth=0.5)
+    plt.plot(time, nz + 0.00, color='black', linewidth=0.5)
+    plt.plot(time, nz - 0.25, color='black', linewidth=0.5)
+    plt.plot(time, nz - 0.50, color='black', linewidth=0.5)
+    plt.plot(time, nz - polar_area + 0.50, color='black', linewidth=0.5)
 
     plt.gca().tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False,
                           labelbottom=False, labeltop=False, labelleft=False, labelright=False)
@@ -333,38 +315,34 @@ def plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_co
     fig, axs = plt.subplots(1, 1)
     fig.set_size_inches(24, 4)
 
-    # Analysis layers
-    plt.fill_between(time, np.zeros(ntime) - polar_area + 0.50,
-                     np.zeros(ntime) - polar_area + 0.50 - smooth_coverage[:, 6], color=spole)
-    plt.fill_between(time, np.zeros(ntime) - 0.25, np.zeros(ntime) - 0.25 - smooth_coverage[:, 5], color=sh_extra)
-    plt.fill_between(time, np.zeros(ntime), 0.0 - smooth_coverage[:, 4], color=tropics)
+    nz = np.zeros(ntime)
 
-    plt.fill_between(time, np.zeros(ntime) + polar_area - 0.5,
-                     np.zeros(ntime) + polar_area - 0.5 + smooth_coverage[:, 1], color=npole)
-    plt.fill_between(time, np.zeros(ntime) + 0.25, np.zeros(ntime) + 0.25 + smooth_coverage[:, 2], color=nh_extra)
-    plt.fill_between(time, np.zeros(ntime), smooth_coverage[:, 3], color=tropics)
+    # Analysis layers
+    plt.fill_between(time, nz - polar_area + 0.50, nz - polar_area + 0.50 - smooth_coverage[:, 6], color=spole)
+    plt.fill_between(time, nz - 0.25, nz - 0.25 - smooth_coverage[:, 5], color=sh_extra)
+    plt.fill_between(time, nz, 0.0 - smooth_coverage[:, 4], color=tropics)
+
+    plt.fill_between(time, nz + polar_area - 0.5, nz + polar_area - 0.5 + smooth_coverage[:, 1], color=npole)
+    plt.fill_between(time, nz + 0.25, nz + 0.25 + smooth_coverage[:, 2], color=nh_extra)
+    plt.fill_between(time, nz, smooth_coverage[:, 3], color=tropics)
 
     # And unfilled
     alfa = 0.3
-    plt.fill_between(time, np.zeros(ntime) - polar_area + 0.50,
-                     np.zeros(ntime) - polar_area + 0.50 - smooth_coverage_unfilled[:, 6], color='white', alpha=alfa)
-    plt.fill_between(time, np.zeros(ntime) - 0.25, np.zeros(ntime) - 0.25 - smooth_coverage_unfilled[:, 5],
-                     color='white', alpha=alfa)
-    plt.fill_between(time, np.zeros(ntime), 0.0 - smooth_coverage_unfilled[:, 4], color='white', alpha=alfa)
+    plt.fill_between(time, nz - polar_area + 0.50, nz - polar_area + 0.50 - smooth_coverage_unfilled[:, 6], color='white', alpha=alfa)
+    plt.fill_between(time, nz - 0.25, nz - 0.25 - smooth_coverage_unfilled[:, 5], color='white', alpha=alfa)
+    plt.fill_between(time, nz, 0.0 - smooth_coverage_unfilled[:, 4], color='white', alpha=alfa)
 
-    plt.fill_between(time, np.zeros(ntime) + polar_area - 0.5,
-                     np.zeros(ntime) + polar_area - 0.5 + smooth_coverage_unfilled[:, 1], color='white', alpha=alfa)
-    plt.fill_between(time, np.zeros(ntime) + 0.25, np.zeros(ntime) + 0.25 + smooth_coverage_unfilled[:, 2],
-                     color='white', alpha=alfa)
-    plt.fill_between(time, np.zeros(ntime), smooth_coverage_unfilled[:, 3], color='white', alpha=alfa)
+    plt.fill_between(time, nz + polar_area - 0.5, nz + polar_area - 0.5 + smooth_coverage_unfilled[:, 1], color='white', alpha=alfa)
+    plt.fill_between(time, nz + 0.25, nz + 0.25 + smooth_coverage_unfilled[:, 2], color='white', alpha=alfa)
+    plt.fill_between(time, nz, smooth_coverage_unfilled[:, 3], color='white', alpha=alfa)
 
-    plt.plot(time, np.zeros(ntime) + polar_area - 0.50, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) + 0.50, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) + 0.25, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) + 0.00, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) - 0.25, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) - 0.50, color='black', linewidth=0.5)
-    plt.plot(time, np.zeros(ntime) - polar_area + 0.50, color='black', linewidth=0.5)
+    plt.plot(time, nz + polar_area - 0.50, color='black', linewidth=0.5)
+    plt.plot(time, nz + 0.50, color='black', linewidth=0.5)
+    plt.plot(time, nz + 0.25, color='black', linewidth=0.5)
+    plt.plot(time, nz + 0.00, color='black', linewidth=0.5)
+    plt.plot(time, nz - 0.25, color='black', linewidth=0.5)
+    plt.plot(time, nz - 0.50, color='black', linewidth=0.5)
+    plt.plot(time, nz - polar_area + 0.50, color='black', linewidth=0.5)
 
     plt.gca().tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False,
                           labelbottom=False, labeltop=False, labelleft=False, labelright=False)
@@ -405,31 +383,33 @@ def plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_co
     plt.close()
 
 
-data_dir_env = os.getenv('DATADIR')
+if __name__ == '__main__':
 
-glosat_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
-filename = 'GloSATref.1.0.0.0.analysis.anomalies.ensemble_median.nc'
+    data_dir_env = os.getenv('DATADIR')
 
-plot_colorbar('colorbar.svg')
+    glosat_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
+    filename = 'GloSATref.1.0.0.0.analysis.anomalies.ensemble_median.nc'
 
-ds = xa.open_dataset(glosat_dir / filename)
-data = ds.tas_median
-anomaly_map(data, 'anomalies')
+    plot_colorbar('colorbar.svg')
 
-ds = xa.open_dataset(glosat_dir / filename)
-data = ds.tas_median
-coverage_map(data, 'analysis')
-areas_map(ds)
-time, smooth_coverage, polar_area = calculate_coverage_timeseries(ds)
+    ds = xa.open_dataset(glosat_dir / filename)
+    data = ds.tas_median
+    anomaly_map(data, 'anomalies')
 
-glosat_dir = Path(data_dir_env) / 'GloSAT' / 'unfilled' / 'diagnostics'
-filename = 'GloSATref.1.0.0.0.noninfilled.anomalies.ensemble_median.nc'
+    ds = xa.open_dataset(glosat_dir / filename)
+    data = ds.tas_median
+    coverage_map(data, 'analysis')
+    areas_map(ds)
+    time, smooth_coverage, polar_area = calculate_coverage_timeseries(ds)
 
-ds = xa.open_dataset(glosat_dir / filename)
-data = ds.tas_median
-coverage_map(data, 'unfilled')
-time_unfilled, smooth_coverage_unfilled, _ = calculate_coverage_timeseries(ds)
+    glosat_dir = Path(data_dir_env) / 'GloSAT' / 'unfilled' / 'diagnostics'
+    filename = 'GloSATref.1.0.0.0.noninfilled.anomalies.ensemble_median.nc'
 
-plot_non_centred_coverage_timeseries(time, smooth_coverage)
-plot_centred_coverage_timeseries(time, smooth_coverage)
-plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_coverage_unfilled)
+    ds = xa.open_dataset(glosat_dir / filename)
+    data = ds.tas_median
+    coverage_map(data, 'unfilled')
+    time_unfilled, smooth_coverage_unfilled, _ = calculate_coverage_timeseries(ds)
+
+    plot_non_centred_coverage_timeseries(time, smooth_coverage)
+    plot_centred_coverage_timeseries(time, smooth_coverage)
+    plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_coverage_unfilled)

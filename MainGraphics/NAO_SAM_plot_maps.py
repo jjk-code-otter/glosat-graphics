@@ -1,12 +1,6 @@
-import xarray as xr
-import numpy as np
-#import matplotlib.pyplot as plt
-#import cartopy.crs as ccrs
-#import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import os
 from pathlib import Path
 
 

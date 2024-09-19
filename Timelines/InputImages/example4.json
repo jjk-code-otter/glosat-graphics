@@ -1,0 +1,36 @@
+{
+  "start_year": 1845,
+  "end_year": 2025,
+  "labels": [
+    [1854, null, "Maury Conference"],
+    [1858, null, "Time routinely reported"],
+    [1868, null, "Suez Canal opens"],
+    [1874, null, "Early transatlantic steam ships"],
+    [1900, null, "SST Observations outnumber AT"],
+    [1914, null, "Panama Canal opens"],
+    [1914, 1918, "First World War"],
+    [1939, 1945, "Second World War"],
+    [1973, null, "Operational moored buoys"],
+    [1979, null, "AVHRR-1 nighttime SST possible"],
+    [1979, null, "Drifting buoys"],
+    [1985, null, "TAO moorings"],
+    [1991, null, "ATSR (dual view SST)"],
+    [1999, null, "PIRATA morrings", -2],
+    [2001, null, "TAO/TRITON", -1],
+    [2002, null, "AMSR-E (microwave SST)"],
+    [2005, null, "Drifter array complete"],
+    [2007, null, "Loss of ICOADS callsigns", 1],
+    [2012, null, "Loss of AATSR"]
+  ],
+  "images": [
+    [1850, 20, "example.png"],
+    [1875, null, "example2.png"],
+    [1920, null, "example3.png"],
+    [1949, null, "example4.png"],
+    [1985, null, "example5.png"],
+    [1991, null, "example6.png"],
+    [2010, -20, "example7.png"],
+    [2011, null, "example8.png"],
+    [2015, null, "example9.png"]
+  ]
+}

@@ -12,7 +12,7 @@ import datetime
 import matplotlib.dates as mdates
 
 
-def calculate_global_mean(ds, climatology):
+def calculate_global_mean(ds, climatology, window=12):
     #Extract tas
     data = ds.tas
 
@@ -44,7 +44,7 @@ def calculate_global_mean(ds, climatology):
     climatological_average = np.mean(df.tas.array[(years >= climatology[0]) & (years <= climatology[1])])
     df.tas = df.tas - climatological_average
 
-    df = df.rolling(window=12).mean()
+    df = df.rolling(window=window).mean()
 
     return df, time
 
@@ -111,12 +111,12 @@ summary_ukesm_model[:, 0] = np.mean(ukesm_models, axis=1)
 summary_ukesm_model[:, 1] = np.min(ukesm_models, axis=1)
 summary_ukesm_model[:, 2] = np.max(ukesm_models, axis=1)
 
-np.save(f'ukesm_model_summary_{climatology[0]}-{climatology[1]}.npy', summary_ukesm_model)
-np.save(f'model_summary_{climatology[0]}-{climatology[1]}.npy', summary_model)
-np.save(f'ukesm_model_time_{climatology[0]}-{climatology[1]}.npy', ukesm_model_time)
-np.save(f'model_time_{climatology[0]}-{climatology[1]}.npy', model_time)
-np.save(f'particle_time_{climatology[0]}-{climatology[1]}.npy', particle_time)
-np.save(f'particle_{climatology[0]}-{climatology[1]}.npy', particle)
+np.save(f'OutputData/ukesm_model_summary_{climatology[0]}-{climatology[1]}.npy', summary_ukesm_model)
+np.save(f'OutputData/model_summary_{climatology[0]}-{climatology[1]}.npy', summary_model)
+np.save(f'OutputData/ukesm_model_time_{climatology[0]}-{climatology[1]}.npy', ukesm_model_time)
+np.save(f'OutputData/model_time_{climatology[0]}-{climatology[1]}.npy', model_time)
+np.save(f'OutputData/particle_time_{climatology[0]}-{climatology[1]}.npy', particle_time)
+np.save(f'OutputData/particle_{climatology[0]}-{climatology[1]}.npy', particle)
 
 summary_glosat = np.zeros((2892, 3))
 summary_glosat[:, 0] = np.mean(glosat, axis=1)
@@ -128,12 +128,10 @@ summary_hadcrut[:, 0] = np.mean(hadcrut, axis=1)
 summary_hadcrut[:, 1] = np.quantile(hadcrut, 0.01, axis=1)
 summary_hadcrut[:, 2] = np.quantile(hadcrut, 0.99, axis=1)
 
-axs.fill_between(glosat_time, summary_glosat[:, 1], summary_glosat[:, 2], alpha=0.5, facecolor='#ab4be3',
-                 edgecolor=None)
+axs.fill_between(glosat_time, summary_glosat[:, 1], summary_glosat[:, 2], alpha=0.5, facecolor='#ab4be3', edgecolor=None)
 axs.plot(glosat_time, summary_glosat[:, 0], color='#ab4be3', linewidth=1)
 
-axs.fill_between(ukesm_model_time, summary_ukesm_model[:, 1], summary_ukesm_model[:, 2], alpha=0.5, facecolor='#aaffaa',
-                 edgecolor=None)
+axs.fill_between(ukesm_model_time, summary_ukesm_model[:, 1], summary_ukesm_model[:, 2], alpha=0.5, facecolor='#aaffaa', edgecolor=None)
 axs.plot(ukesm_model_time, summary_ukesm_model[:, 0], color='#55ff55', linewidth=3)
 
 axs.fill_between(model_time, summary_model[:, 1], summary_model[:, 2], alpha=0.5, facecolor='#aaaaaa', edgecolor=None)
@@ -141,8 +139,7 @@ axs.plot(model_time, summary_model[:, 0], color='#555555', linewidth=1)
 
 axs.plot(particle_time, particle, '--', color='#555555', linewidth=1, )
 
-axs.fill_between(hadcrut_time, summary_hadcrut[:, 1], summary_hadcrut[:, 2], alpha=0.5, facecolor='#fcba03',
-                 edgecolor=None)
+axs.fill_between(hadcrut_time, summary_hadcrut[:, 1], summary_hadcrut[:, 2], alpha=0.5, facecolor='#fcba03', edgecolor=None)
 axs.plot(hadcrut_time, summary_hadcrut[:, 0], color='#fcba03', linewidth=1)
 
 # axs.spines['bottom'].set_position('zero')
