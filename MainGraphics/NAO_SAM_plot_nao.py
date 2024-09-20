@@ -64,7 +64,7 @@ def plot_bar(ax, time, value, delta, color_positive, color_negative):
 if __name__ == '__main__':
 
     # https://crudata.uea.ac.uk/cru/data/nao/nao_3dp.dat
-    years, months, nao = read_nao('InputData/nao_3dp.dat.txt')
+    years, months, nao = read_nao('InputData/nao_3dp.dat.txt.txt')
 
     # Calculate seasonal averages
     nao_3month = seasonal_running_average(nao)

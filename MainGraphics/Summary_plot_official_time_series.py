@@ -28,8 +28,7 @@ def get_volcanoes():
 
 
 def read_standard_timeseries(filename):
-    filename = f'GloSATref.1.0.0.0.analysis.component_series.global.monthly.nc'
-    ds = xa.open_dataset(glosat_dir / filename)
+    ds = xa.open_dataset(filename)
     data = ds.tas_mean
     uncertainty = ds.tas_total_unc
 
@@ -47,8 +46,7 @@ def read_standard_timeseries(filename):
 
 
 def read_hadcrut_timeseries(filename):
-    filename = 'HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.nc'
-    ds = xa.open_dataset(hadcrut_dir / filename)
+    ds = xa.open_dataset(filename)
     data = ds.tas_mean
     uncertainty_high = ds.tas_upper
     uncertainty_low = ds.tas_lower
@@ -69,6 +67,7 @@ def read_hadcrut_timeseries(filename):
 
     return hadcrut, hadcrut_unc_lower, hadcrut_unc_upper, hadcrut_time
 
+
 if __name__ == '__main__':
     data_dir_env = os.getenv('DATADIR')
     glosat_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
@@ -78,19 +77,24 @@ if __name__ == '__main__':
     n_ensemble = 200
 
     # Read in the GLOSAT pre-calculated time series
-    glosat, glosat_unc, glosat_time = read_standard_timeseries(glosat_dir / f'GloSATref.1.0.0.0.analysis.component_series.global.monthly.nc')
-    hadcrut, hadcrut_unc_lower, hadcrut_unc_upper, hadcrut_time = read_hadcrut_timeseries(hadcrut_dir / 'HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.nc')
+    glosat, glosat_unc, glosat_time = read_standard_timeseries(
+        glosat_dir / f'GloSATref.1.0.0.0.analysis.component_series.global.monthly.nc')
+    hadcrut, hadcrut_unc_lower, hadcrut_unc_upper, hadcrut_time = read_hadcrut_timeseries(
+        hadcrut_dir / 'HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.nc')
 
     # Load the model data (see Summary_calculate_time_series.py for actual calculations)
     try:
-        summary_ukesm_model = np.load(f'OutputData/ukesm_model_summary_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
-        ukesm_model_time = np.load(f'OutputData/ukesm_model_time_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
+        summary_ukesm_model = np.load(f'OutputData/ukesm_model_summary_{climatology[0]}-{climatology[1]}.npy',
+                                      allow_pickle=True)
+        ukesm_model_time = np.load(f'OutputData/ukesm_model_time_{climatology[0]}-{climatology[1]}.npy',
+                                   allow_pickle=True)
         summary_model = np.load(f'OutputData/model_summary_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
         model_time = np.load(f'OutputData/model_time_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
         particle_time = np.load(f'OutputData/particle_time_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
         particle = np.load(f'OutputData/particle_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
     except:
-        raise FileNotFoundError("There was a problem reading one of the input files. Have you run Summary_calculate_time_series.py yet?")
+        raise FileNotFoundError(
+            "There was a problem reading one of the input files. Have you run Summary_calculate_time_series.py yet?")
 
     hadcrut_year = np.array([x.year for x in hadcrut_time])
     glosat_year = np.array([x.year for x in glosat_time])
@@ -124,11 +128,11 @@ if __name__ == '__main__':
 
     axs.fill_between(
         model_time,
-        summary_model[:, 1] ,
-        summary_model[:, 2] ,
+        summary_model[:, 1],
+        summary_model[:, 2],
         alpha=0.5, facecolor='#aaaaaa', edgecolor=None
     )
-    axs.plot(model_time, summary_model[:, 0] , color='#555555', linewidth=1)
+    axs.plot(model_time, summary_model[:, 0], color='#555555', linewidth=1)
 
     glosat_low = glosat - glosat_unc
     glosat_high = glosat + glosat_unc
@@ -151,6 +155,8 @@ if __name__ == '__main__':
     plt.gca().set_ylim(-1.1, 1.6)
     plt.gca().set_title("Global mean surface air temperature 1790-2023", pad=5, fontdict={'fontsize': 20}, loc='left')
 
-    plt.savefig(Path('OutputFigures') / 'long_time_series_official_1850_1900.png', bbox_inches='tight', dpi=600, transparent=True)
-    plt.savefig(Path('OutputFigures') / 'long_time_series_official_1850_1900.svg', bbox_inches='tight', transparent=True)
+    plt.savefig(Path('OutputFigures') / 'long_time_series_official_1850_1900.png', bbox_inches='tight', dpi=600,
+                transparent=True)
+    plt.savefig(Path('OutputFigures') / 'long_time_series_official_1850_1900.svg', bbox_inches='tight',
+                transparent=True)
     plt.close()

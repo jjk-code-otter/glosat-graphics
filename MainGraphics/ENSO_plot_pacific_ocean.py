@@ -21,6 +21,7 @@ if __name__ == '__main__':
 
     data_dir_env = Path(os.getenv('DATADIR'))
 
+    # From https://www.metoffice.gov.uk/hadobs/hadisst/data/HadISST_sst.nc.gz
     # Load the HadISST NetCDF dataset
     file_path = data_dir_env / 'ManagedData' / 'Data' / 'HadISST' / 'HadISST_sst.nc'
     ds = xr.open_dataset(file_path)
