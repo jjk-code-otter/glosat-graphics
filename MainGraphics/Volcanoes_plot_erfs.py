@@ -42,55 +42,56 @@ def get_volcanoes():
     }
     return volcanoes
 
+if __name__ == '_main__':
+    fig, axs = plt.subplots(1, 1)
+    fig.set_size_inches(18, 6)
 
-fig, axs = plt.subplots(1, 1)
-fig.set_size_inches(18, 6)
+    plt.plot(solar_years, solar_erf, color='#FBD200', linewidth=3)
 
-plt.plot(solar_years, solar_erf, color='#FBD200', linewidth=3)
+    axs.spines['right'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.set_title("Solar forcing 1750-2004", pad=5, fontdict={'fontsize': 20}, loc='left', color='#ffffff')
+    axs.tick_params(axis='both', which='major', labelsize=15)
 
-axs.spines['right'].set_visible(False)
-axs.spines['top'].set_visible(False)
-axs.set_title("Solar forcing 1750-2004", pad=5, fontdict={'fontsize': 20}, loc='left', color='#ffffff')
-axs.tick_params(axis='both', which='major', labelsize=15)
+    axs.spines['bottom'].set_color('#ffffff')
+    axs.spines['top'].set_color('#ffffff')
+    axs.spines['right'].set_color('#ffffff')
+    axs.spines['left'].set_color('#ffffff')
+    axs.tick_params(axis='x', colors='#ffffff')
+    axs.tick_params(axis='y', colors='#ffffff')
 
-axs.spines['bottom'].set_color('#ffffff')
-axs.spines['top'].set_color('#ffffff')
-axs.spines['right'].set_color('#ffffff')
-axs.spines['left'].set_color('#ffffff')
-axs.tick_params(axis='x', colors='#ffffff')
-axs.tick_params(axis='y', colors='#ffffff')
+    axs.set_xlim(1749, 2025)
 
-axs.set_xlim(1749, 2025)
+    plt.savefig('OutputFigures/solar_erf.svg', transparent=True, bbox_inches='tight')
+    plt.close()
 
-plt.savefig('OutputFigures/solar_erf.svg', transparent=True, bbox_inches='tight')
-plt.close()
+    fig, axs = plt.subplots(1, 1)
+    fig.set_size_inches(27, 6)
 
-fig, axs = plt.subplots(1, 1)
-fig.set_size_inches(27, 6)
+    plt.plot(volcanic_years, volcanic_erf, color='#555555', linewidth=3)
+    plt.fill_between(volcanic_years, volcanic_zero, volcanic_erf, color='#555555')
 
-plt.plot(volcanic_years, volcanic_erf, color='#555555', linewidth=3)
-plt.fill_between(volcanic_years, volcanic_zero, volcanic_erf, color='#555555')
+    axs.spines['right'].set_visible(False)
+    axs.spines['bottom'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.set_title("")
+    axs.tick_params(axis='both', which='major', labelsize=15)
 
-axs.spines['right'].set_visible(False)
-axs.spines['bottom'].set_visible(False)
-axs.spines['top'].set_visible(False)
-axs.set_title("")
-axs.tick_params(axis='both', which='major', labelsize=15)
+    axs.spines['bottom'].set_color('#555555')
+    axs.spines['top'].set_color('#555555')
+    axs.spines['right'].set_color('#555555')
+    axs.spines['left'].set_color('#555555')
+    axs.tick_params(axis='x', colors='#555555')
+    axs.tick_params(axis='y', colors='#555555')
 
-axs.spines['bottom'].set_color('#555555')
-axs.spines['top'].set_color('#555555')
-axs.spines['right'].set_color('#555555')
-axs.spines['left'].set_color('#555555')
-axs.tick_params(axis='x', colors='#555555')
-axs.tick_params(axis='y', colors='#555555')
+    plt.gca().set_ylim(-6, 0.5)
 
-plt.gca().set_ylim(-6, 0.5)
+    volcanoes = get_volcanoes()
+    for v in volcanoes:
+        plt.plot([volcanoes[v], volcanoes[v]], [-4.8, -5], color='#eeeeee')
 
-volcanoes = get_volcanoes()
-for v in volcanoes:
-    plt.plot([volcanoes[v], volcanoes[v]], [-4.8, -5], color='#eeeeee')
+    # Turn those erf dips into mountains
+    plt.gca().invert_yaxis()
 
-plt.gca().invert_yaxis()
-
-plt.savefig('OutputFigures/volcanic_erf.svg', transparent=True, bbox_inches='tight')
-plt.close()
+    plt.savefig('OutputFigures/volcanic_erf.svg', transparent=True, bbox_inches='tight')
+    plt.close()

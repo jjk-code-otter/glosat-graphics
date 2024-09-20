@@ -55,6 +55,29 @@ def read_bas_sam(filename):
     return bas2_years, bas2_sam
 
 
+def plot_bar(ax, time, value, delta, color_positive, color_negative):
+    x = time + delta
+    y = 0
+    width = 1 - 2 * delta
+    height = value
+
+    if value > 0:
+        ax.add_patch(Rectangle((x, y), width, height, facecolor=color_positive, edgecolor=None))
+    else:
+        ax.add_patch(Rectangle((x, y), width, height, facecolor=color_negative, edgecolor=None))
+
+def plot_uncertainty_bar(ax, time, value, unc, delta, color_positive, color_negative):
+    x = time + delta
+    y = value - unc
+    width = 1 - 2 * delta
+    height = 2 * unc
+
+    if value > 0:
+        ax.add_patch(Rectangle((x, y), width, height, facecolor=color_positive, edgecolor=None))
+    else:
+        ax.add_patch(Rectangle((x, y), width, height, facecolor=color_negative, edgecolor=None))
+
+
 if __name__ == '__main__':
     # https://www.ncei.noaa.gov/pub/data/paleo/contributions_by_author/abram2014/abram2014sam-noaa.txt
     years, sam_recon, sam_unc, sam_marshall = read_sam('InputData/abram2014sam-noaa.txt')
@@ -64,52 +87,24 @@ if __name__ == '__main__':
     # Plot NAO
     fig, ax = plt.subplots(figsize=(16, 5))
 
-    # Stripes every 25 years
+    # Sets the gaps between the bars.
+    delta = 0.1
+
+    # Grey stripes every 25 years to help readability of x axis values
     for i in range(4):
-        ax.add_patch(Rectangle((1825 + i * 50, -5), 25, 11, color='lightgrey', alpha=0.5))
+        ax.add_patch(Rectangle((1825 + i * 50, -5.5), 25, 11, color='lightgrey', alpha=0.5))
 
     for i in range(len(sam_recon)):
-        if sam_recon[i] is not None:
-            col = 'pink'
-            col2 = 'red'
-            if sam_recon[i] < 0:
-                col = 'lightblue'
-                col2 = 'blue'
-
-            # Sets the gaps between the bars.
-            delta = 0.1
-
-        if years[i] < 1957:
-            ax.add_patch(
-                Rectangle(
-                    (years[i] + delta, sam_recon[i] - sam_unc[i]),
-                    1 - 2 * delta,
-                    2 * sam_unc[i],
-                    facecolor=col, edgecolor=None
-                )
-            )
-
-            ax.add_patch(
-                Rectangle(
-                    (years[i] + delta, 0),
-                    1 - 2 * delta,
-                    sam_recon[i],
-                    facecolor=col2, edgecolor='black'
-                )
-            )
+        if sam_recon[i] is not None and years[i] < 1957:
+            plot_uncertainty_bar(ax, years[i], sam_recon[i], sam_unc[i], delta, "pink", "lightblue")
+            plot_bar(ax, years[i], sam_recon[i], delta, "red", "blue")
 
     for i in range(len(bas2_sam)):
         if bas2_sam[i] is not None:
-            col = 'red'
-            if bas2_sam[i] < 0:
-                col = 'blue'
+            plot_bar(ax, bas2_years[i], bas2_sam[i], delta, "red", "blue")
 
-            # Sets the gaps between the bars.
-            delta = 0.1
-
-            ax.add_patch(
-                Rectangle((bas2_years[i] + delta, 0), 1 - 2 * delta, bas2_sam[i], facecolor=col, edgecolor='black')
-            )
+    # ax.text(1955, 5, 'Abram et al. 2014 reconstruction', fontsize=10, ha='right')
+    # ax.text(1959, 5, 'Marshall 2003', fontsize=10, ha='left')
 
     ax.set_xlim(1825, 2025)
     ax.set_ylim(-5.5, 5.5)

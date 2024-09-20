@@ -49,6 +49,18 @@ def seasonal_running_average(nao):
     return nao_3month
 
 
+def plot_bar(ax, time, value, delta, color_positive, color_negative):
+    x = time + delta
+    y = 0
+    width = 1 - 2 * delta
+    height = value
+
+    if value > 0:
+        ax.add_patch(Rectangle((x, y), width, height, facecolor=color_positive, edgecolor=None))
+    else:
+        ax.add_patch(Rectangle((x, y), width, height, facecolor=color_negative, edgecolor=None))
+
+
 if __name__ == '__main__':
 
     # https://crudata.uea.ac.uk/cru/data/nao/nao_3dp.dat
@@ -67,6 +79,9 @@ if __name__ == '__main__':
     # Plot NAO
     fig, ax = plt.subplots(figsize=(16, 5))
 
+    # Sets the gaps between the bars.
+    delta = 0.1
+
     # Stripes every 25 years
     for i in range(4):
         ax.add_patch(
@@ -74,13 +89,7 @@ if __name__ == '__main__':
         )
 
     for i in range(len(sub_years)):
-        col = 'red'
-        if sub_nao[i] < 0:
-            col = 'blue'
-        delta = 0.1
-        ax.add_patch(
-            Rectangle((sub_years[i] + delta, 0), 1 - 2 * delta, sub_nao[i], facecolor=col, edgecolor='black')
-        )
+        plot_bar(ax, sub_years[i], sub_nao[i], delta, "red", "blue")
 
     ax.set_xlim(1825, 2025)
     ax.set_ylim(-3.5, 3.5)

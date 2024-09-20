@@ -11,7 +11,6 @@ def read_monthly_sunspot_file(filename):
             columns = line.split(';')
             time.append(float(columns[2]))
             data.append(float(columns[3]))
-
     return data, time
 
 

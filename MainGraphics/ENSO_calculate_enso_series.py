@@ -54,20 +54,25 @@ def summarise_ensemble(ensemble):
 
 
 def get_el_nino_years():
+    # Table 2 in Meyers et al. (2006) From  The Years of El Niño, La Niña, and Interactions with the Tropical Indian Ocean.
+    # Journal of Climate
     el_nino_years = [
-        1877, 1880, 1884, 1887, 1891, 1896,
-        1897, 1900, 1903, 1906, 1915, 1919, 1926, 1931, 1941, 1942, 1958, 1966, 1973, 1978, 1980, 1983, 1987,
-        1988, 1992, 1995, 1998, 2003, 2007, 2010, 2016
+        1877, 1888, 1896, 1899,
+        1902,1905, 1911, 1914, 1918, 1923, 1925, 1930, 1940, 1941,
+        1957,1963, 1965, 1972, 1982,1986,1987,1991, 1997,
+        2002, 2009, 2015, 2023
     ]
     return el_nino_years
 
 
 def get_la_nina_years():
+    # Table 2 in Meyers et al. (2006) From  The Years of El Niño, La Niña, and Interactions with the Tropical Indian Ocean.
+    # Journal of Climate
     la_nina_years = [
-        1886, 1889, 1892, 1898, 1903, 1906,
-        1904, 1909, 1910, 1911, 1917, 1918, 1925, 1934, 1939, 1943, 1950, 1951, 1955, 1956, 1962, 1971, 1974, 1976,
-        1989,
-        1999, 2000, 2008, 2011, 2012, 2021, 2022
+        1878, 1879, 1886, 1889, 1890, 1892, 1893, 1897,
+        1903, 1906, 1909, 1910, 1916, 1917, 1922, 1924, 1928, 1933, 1938, 1942, 1949,
+        1950, 1954, 1955, 1964, 1970, 1971, 1973, 1975, 1978, 1981, 1984, 1988, 1996, 1998, 1999,
+        2000, 2007, 2010, 2011, 2017, 2020, 2021, 2022,
     ]
     return la_nina_years
 
@@ -91,95 +96,96 @@ def plot_rectangles_for_list_of_years(year_list, color):
         plt.fill_between(el_nino_list[key], [-4, -4], [4, 4], color=color, alpha=0.1)
 
 
-data_dir_env = os.getenv('DATADIR')
-glosat_dir = Path(data_dir_env) / 'GloSAT' / 'glosatref1000'
-glosat_diagnostic_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
-hadcrut_dir = Path(data_dir_env) / 'GloSAT' / 'hadcrut5'
+if __name__ == '__main__':
 
-filename = f'GloSATref.1.0.0.0.analysis.component_series.global.monthly.nc'
-glosat, glosat_unc, glosat_time = read_standard_time_series(glosat_diagnostic_dir / filename)
+    data_dir_env = os.getenv('DATADIR')
+    glosat_dir = Path(data_dir_env) / 'GloSAT' / 'glosatref1000'
+    glosat_diagnostic_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
+    hadcrut_dir = Path(data_dir_env) / 'GloSAT' / 'hadcrut5'
 
-areas = {
-    'enso': [-180, -120, -5, 5],
-    'nh': [-180, 180, 0, 90],
-    'sh': [-180, 180, -90, 0]
-}
+    filename = f'GloSATref.1.0.0.0.analysis.component_series.global.monthly.nc'
+    glosat, glosat_unc, glosat_time = read_standard_time_series(glosat_diagnostic_dir / filename)
 
-n_ensemble = 200
+    areas = {
+        'enso': [-180, -120, -5, 5],
+        'nh': [-180, 180, 0, 90],
+        'sh': [-180, 180, -90, 0]
+    }
 
-glosat_summaries = {}
-hadcrut_summaries = {}
-for area in areas:
-    glosat_summaries[area] = np.zeros((2892, n_ensemble))
-    hadcrut_summaries[area] = np.zeros((2092, n_ensemble))
+    n_ensemble = 200
 
-# Calculate area averages from all ensemble members for the specified areas
-for i in range(1, n_ensemble + 1):
-    print(f"Ensemble member {i}")
-    filename = f'GloSATref.1.0.0.0.analysis.anomalies.{i}.nc'
-    ds_orig = xa.open_dataset(glosat_dir / filename)
+    glosat_summaries = {}
+    hadcrut_summaries = {}
     for area in areas:
-        ts, time_axis = calculate_area_average(ds_orig, areas[area])
-        glosat_summaries[area][:, i - 1] = ts[:]
-        glosat_time = time_axis
+        glosat_summaries[area] = np.zeros((2892, n_ensemble))
+        hadcrut_summaries[area] = np.zeros((2092, n_ensemble))
 
-    filename = f'HadCRUT.5.0.2.0.analysis.anomalies.{i}.nc'
-    ds_orig = xa.open_dataset(hadcrut_dir / filename)
-    for area in areas:
-        ts, time_axis = calculate_area_average(ds_orig, areas[area])
-        hadcrut_summaries[area][:, i - 1] = ts[:]
-        hadcrut_time = time_axis
+    # Calculate area averages from all ensemble members for the specified areas
+    for i in range(1, n_ensemble + 1):
+        print(f"Ensemble member {i}")
+        filename = f'GloSATref.1.0.0.0.analysis.anomalies.{i}.nc'
+        ds_orig = xa.open_dataset(glosat_dir / filename)
+        for area in areas:
+            ts, time_axis = calculate_area_average(ds_orig, areas[area])
+            glosat_summaries[area][:, i - 1] = ts[:]
+            glosat_time = time_axis
 
-# Calculate ensemble means, mins and maxs
-glosat_mean, glosat_low, glosat_high = summarise_ensemble(glosat_summaries['enso'])
-hadcrut_mean, hadcrut_low, hadcrut_high = summarise_ensemble(hadcrut_summaries['enso'])
-hadcrut_globe, hadcrut_globe_low, hadcrut_globe_high = summarise_ensemble(
-    0.5 * hadcrut_summaries['nh'] + 0.5 * hadcrut_summaries['sh']
-)
+        filename = f'HadCRUT.5.0.2.0.analysis.anomalies.{i}.nc'
+        ds_orig = xa.open_dataset(hadcrut_dir / filename)
+        for area in areas:
+            ts, time_axis = calculate_area_average(ds_orig, areas[area])
+            hadcrut_summaries[area][:, i - 1] = ts[:]
+            hadcrut_time = time_axis
 
-# Plot the global mean temperature with red and blue stripes to indicate El Nino and La Nina events
-fig, axs = plt.subplots(1, 1)
-fig.set_size_inches(12, 4)
+    # Calculate ensemble means, mins and maxs
+    glosat_mean, glosat_low, glosat_high = summarise_ensemble(glosat_summaries['enso'])
+    hadcrut_mean, hadcrut_low, hadcrut_high = summarise_ensemble(hadcrut_summaries['enso'])
+    hadcrut_globe, hadcrut_globe_low, hadcrut_globe_high = summarise_ensemble(
+        0.5 * hadcrut_summaries['nh'] + 0.5 * hadcrut_summaries['sh'])
 
-plt.fill_between(glosat_time, glosat - glosat_unc, glosat + glosat_unc, color='black', alpha=0.2)
-plt.plot(glosat_time, glosat, color="black")
+    # Plot the global mean temperature with red and blue stripes to indicate El Nino and La Nina events
+    fig, axs = plt.subplots(1, 1)
+    fig.set_size_inches(12, 4)
 
-el_nino_years = get_el_nino_years()
-plot_rectangles_for_list_of_years(el_nino_years, "red")
+    plt.fill_between(glosat_time, glosat - glosat_unc, glosat + glosat_unc, color='black', alpha=0.2)
+    plt.plot(glosat_time, glosat, color="black")
 
-la_nina_years = get_la_nina_years()
-plot_rectangles_for_list_of_years(la_nina_years, "blue")
+    el_nino_years = get_el_nino_years()
+    plot_rectangles_for_list_of_years(el_nino_years, "red")
 
-plt.gca().set_ylim(-1, 1.2)
-axs.spines['right'].set_visible(False)
-axs.spines['top'].set_visible(False)
-axs.set_xlim([datetime.date(1870, 1, 1), datetime.date(2024, 12, 31)])
-axs.xaxis.set_major_locator(mdates.YearLocator(base=10))
-axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    la_nina_years = get_la_nina_years()
+    plot_rectangles_for_list_of_years(la_nina_years, "blue")
 
-plt.savefig(Path('OutputFigures') / 'globe.png', dpi=300, transparent=False, bbox_inches='tight')
-plt.savefig(Path('OutputFigures') / 'globe.svg', dpi=300, transparent=False, bbox_inches='tight')
-plt.close()
+    plt.gca().set_ylim(-1, 1.2)
+    axs.spines['right'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.set_xlim([datetime.date(1870, 1, 1), datetime.date(2024, 12, 31)])
+    axs.xaxis.set_major_locator(mdates.YearLocator(base=10))
+    axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
 
-# Plot the ENSO time series
-fig, axs = plt.subplots(1, 1)
-fig.set_size_inches(12, 4)
+    plt.savefig(Path('OutputFigures') / 'globe.png', dpi=300, transparent=False, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'globe.svg', dpi=300, transparent=False, bbox_inches='tight')
+    plt.close()
 
-plt.fill_between(hadcrut_time, hadcrut_low, hadcrut_high, color="#ff7f0e", alpha=0.1)
-plt.plot(hadcrut_time, hadcrut_mean, color="#ff7f0e", linewidth=0.5)
+    # Plot the ENSO time series
+    fig, axs = plt.subplots(1, 1)
+    fig.set_size_inches(12, 4)
 
-axs.spines['right'].set_visible(False)
-axs.spines['top'].set_visible(False)
-axs.set_xlim([datetime.date(1870, 1, 1), datetime.date(2024, 12, 31)])
-axs.xaxis.set_major_locator(mdates.YearLocator(base=10))
-axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    plt.fill_between(hadcrut_time, hadcrut_low, hadcrut_high, color="#ff7f0e", alpha=0.1)
+    plt.plot(hadcrut_time, hadcrut_mean, color="#ff7f0e", linewidth=0.5)
 
-volcanoes = get_volcanoes()
-for key in volcanoes:
-    plt.fill_between(volcanoes[key], [-4, -4], [4, 4], color="green", alpha=0.1)
+    axs.spines['right'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.set_xlim([datetime.date(1870, 1, 1), datetime.date(2024, 12, 31)])
+    axs.xaxis.set_major_locator(mdates.YearLocator(base=10))
+    axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
 
-plt.gca().set_ylim(-3.1, 3.1)
+    volcanoes = get_volcanoes()
+    for key in volcanoes:
+        plt.fill_between(volcanoes[key], [-4, -4], [4, 4], color="green", alpha=0.1)
 
-plt.savefig(Path('OutputFigures') / 'enso.png', dpi=300, transparent=False, bbox_inches='tight')
-plt.savefig(Path('OutputFigures') / 'enso.svg', dpi=300, transparent=False, bbox_inches='tight')
-plt.close()
+    plt.gca().set_ylim(-3.1, 3.1)
+
+    plt.savefig(Path('OutputFigures') / 'enso.png', dpi=300, transparent=False, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'enso.svg', dpi=300, transparent=False, bbox_inches='tight')
+    plt.close()

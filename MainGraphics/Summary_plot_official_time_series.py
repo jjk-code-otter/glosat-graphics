@@ -69,89 +69,88 @@ def read_hadcrut_timeseries(filename):
 
     return hadcrut, hadcrut_unc_lower, hadcrut_unc_upper, hadcrut_time
 
-data_dir_env = os.getenv('DATADIR')
-glosat_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
-hadcrut_dir = Path(data_dir_env) / 'ManagedData' / 'Data' / 'HadCRUT5'
+if __name__ == '__main__':
+    data_dir_env = os.getenv('DATADIR')
+    glosat_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
+    hadcrut_dir = Path(data_dir_env) / 'ManagedData' / 'Data' / 'HadCRUT5'
 
-climatology = [1850, 1900]
+    climatology = [1850, 1900]
+    n_ensemble = 200
 
-n_ensemble = 200
+    # Read in the GLOSAT pre-calculated time series
+    glosat, glosat_unc, glosat_time = read_standard_timeseries(glosat_dir / f'GloSATref.1.0.0.0.analysis.component_series.global.monthly.nc')
+    hadcrut, hadcrut_unc_lower, hadcrut_unc_upper, hadcrut_time = read_hadcrut_timeseries(hadcrut_dir / 'HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.nc')
 
-glosat = np.zeros((2892, n_ensemble))
-hadcrut = np.zeros((2092, n_ensemble))
+    # Load the model data (see Summary_calculate_time_series.py for actual calculations)
+    try:
+        summary_ukesm_model = np.load(f'OutputData/ukesm_model_summary_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
+        ukesm_model_time = np.load(f'OutputData/ukesm_model_time_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
+        summary_model = np.load(f'OutputData/model_summary_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
+        model_time = np.load(f'OutputData/model_time_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
+        particle_time = np.load(f'OutputData/particle_time_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
+        particle = np.load(f'OutputData/particle_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
+    except:
+        raise FileNotFoundError("There was a problem reading one of the input files. Have you run Summary_calculate_time_series.py yet?")
 
-# Read in the GLOSAT pre-calculated time series
-glosat, glosat_unc, glosat_time = read_standard_timeseries(glosat_dir / f'GloSATref.1.0.0.0.analysis.component_series.global.monthly.nc')
-hadcrut, hadcrut_unc_lower, hadcrut_unc_upper, hadcrut_time = read_hadcrut_timeseries(hadcrut_dir / 'HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.nc')
+    hadcrut_year = np.array([x.year for x in hadcrut_time])
+    glosat_year = np.array([x.year for x in glosat_time])
+    hadcrut_select = (hadcrut_year >= climatology[0]) & (hadcrut_year <= climatology[1])
+    glosat_select = (glosat_year >= climatology[0]) & (glosat_year <= climatology[1])
 
-# Load the model data (see calculate_time_series.py for actual calculations)
-summary_ukesm_model = np.load(f'OutputData/ukesm_model_summary_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
-ukesm_model_time = np.load(f'OutputData/ukesm_model_time_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
-summary_model = np.load(f'OutputData/model_summary_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
-model_time = np.load(f'OutputData/model_time_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
-particle_time = np.load(f'OutputData/particle_time_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
-particle = np.load(f'OutputData/particle_{climatology[0]}-{climatology[1]}.npy', allow_pickle=True)
+    volcanoes = get_volcanoes()
 
-hadcrut_year = np.array([x.year for x in hadcrut_time])
-glosat_year = np.array([x.year for x in glosat_time])
-hadcrut_select = (hadcrut_year >= climatology[0]) & (hadcrut_year <= climatology[1])
-glosat_select = (glosat_year >= climatology[0]) & (glosat_year <= climatology[1])
+    # 1850-1900 time series plot
+    fig, axs = plt.subplots(1, 1)
+    fig.set_size_inches(18, 6)
 
-volcanoes = get_volcanoes()
+    for volcano in volcanoes:
+        plt.plot(volcanoes[volcano], [-1.6, 1.3], color='#555555')
 
+    axs.fill_between(
+        hadcrut_time,
+        hadcrut_unc_lower - np.mean(hadcrut[hadcrut_select]),
+        hadcrut_unc_upper - np.mean(hadcrut[hadcrut_select]),
+        alpha=0.5, facecolor='#ffe100', edgecolor=None
+    )
+    axs.plot(hadcrut_time, hadcrut - np.mean(hadcrut[hadcrut_select]), color='#ffe100', linewidth=1)
 
-# 1850-1900 time series plot
-fig, axs = plt.subplots(1, 1)
-fig.set_size_inches(18, 6)
+    axs.fill_between(
+        ukesm_model_time,
+        summary_ukesm_model[:, 1],
+        summary_ukesm_model[:, 2],
+        alpha=0.5, facecolor='#55ff55', edgecolor=None
+    )
+    axs.plot(ukesm_model_time, summary_ukesm_model[:, 0], color='#55ff55', linewidth=1)
 
-for volcano in volcanoes:
-    plt.plot(volcanoes[volcano], [-1.6, 1.3], color='#555555')
+    axs.fill_between(
+        model_time,
+        summary_model[:, 1] ,
+        summary_model[:, 2] ,
+        alpha=0.5, facecolor='#aaaaaa', edgecolor=None
+    )
+    axs.plot(model_time, summary_model[:, 0] , color='#555555', linewidth=1)
 
-axs.fill_between(
-    hadcrut_time,
-    hadcrut_unc_lower - np.mean(hadcrut[hadcrut_select]),
-    hadcrut_unc_upper - np.mean(hadcrut[hadcrut_select]),
-    alpha=0.5, facecolor='#ffe100', edgecolor=None
-)
-axs.plot(hadcrut_time, hadcrut - np.mean(hadcrut[hadcrut_select]), color='#ffe100', linewidth=1)
+    glosat_low = glosat - glosat_unc
+    glosat_high = glosat + glosat_unc
 
-axs.fill_between(
-    ukesm_model_time,
-    summary_ukesm_model[:, 1],
-    summary_ukesm_model[:, 2],
-    alpha=0.5, facecolor='#55ff55', edgecolor=None
-)
-axs.plot(ukesm_model_time, summary_ukesm_model[:, 0], color='#55ff55', linewidth=1)
+    axs.fill_between(
+        glosat_time,
+        glosat_low - np.mean(glosat[glosat_select]),
+        glosat_high - np.mean(glosat[glosat_select]),
+        alpha=0.5, facecolor='#ab4be3', edgecolor=None
+    )
+    axs.plot(glosat_time, glosat - np.mean(glosat[glosat_select]), color='#ab4be3', linewidth=1)
 
-axs.fill_between(
-    model_time,
-    summary_model[:, 1] ,
-    summary_model[:, 2] ,
-    alpha=0.5, facecolor='#aaaaaa', edgecolor=None
-)
-axs.plot(model_time, summary_model[:, 0] , color='#555555', linewidth=1)
+    # axs.spines['bottom'].set_position('zero')
+    axs.spines['right'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.set_xlim([datetime.date(1790, 1, 1), datetime.date(2024, 12, 31)])
+    axs.xaxis.set_major_locator(mdates.YearLocator(base=20))
+    axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
 
-glosat_low = glosat - glosat_unc
-glosat_high = glosat + glosat_unc
+    plt.gca().set_ylim(-1.1, 1.6)
+    plt.gca().set_title("Global mean surface air temperature 1790-2023", pad=5, fontdict={'fontsize': 20}, loc='left')
 
-axs.fill_between(
-    glosat_time,
-    glosat_low - np.mean(glosat[glosat_select]),
-    glosat_high - np.mean(glosat[glosat_select]),
-    alpha=0.5, facecolor='#ab4be3', edgecolor=None
-)
-axs.plot(glosat_time, glosat - np.mean(glosat[glosat_select]), color='#ab4be3', linewidth=1)
-
-# axs.spines['bottom'].set_position('zero')
-axs.spines['right'].set_visible(False)
-axs.spines['top'].set_visible(False)
-axs.set_xlim([datetime.date(1790, 1, 1), datetime.date(2024, 12, 31)])
-axs.xaxis.set_major_locator(mdates.YearLocator(base=20))
-axs.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-
-plt.gca().set_ylim(-1.1, 1.6)
-plt.gca().set_title("Global mean surface air temperature 1790-2023", pad=5, fontdict={'fontsize': 20}, loc='left')
-
-plt.savefig(Path('OutputFigures') / 'long_time_series_official_1850_1900.png', bbox_inches='tight', dpi=600, transparent=True)
-plt.savefig(Path('OutputFigures') / 'long_time_series_official_1850_1900.svg', bbox_inches='tight', transparent=True)
-plt.close()
+    plt.savefig(Path('OutputFigures') / 'long_time_series_official_1850_1900.png', bbox_inches='tight', dpi=600, transparent=True)
+    plt.savefig(Path('OutputFigures') / 'long_time_series_official_1850_1900.svg', bbox_inches='tight', transparent=True)
+    plt.close()
