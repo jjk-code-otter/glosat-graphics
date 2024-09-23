@@ -47,19 +47,25 @@ serve the files so they're not available directly. To run type the following at 
 
 `python get_data.py`
 
-Other files are part of the project or represent large quantities of data that you probably want to manage separately. 
-I've followed the GloSAT/HadCRUT directory structure for the obs data underneath a main directory specified by the 
-environment variable `$DATADIR`. These include:
+You might need to unzip some of these. Other files are part of the project or represent large quantities of data 
+that you probably want to manage separately. I've followed the GloSAT/HadCRUT directory structure for the obs data 
+underneath a main directory specified by the environment variable `$DATADIR`. These include:
 
 * GloSATref.1.0.0.0.analysis.anomalies.ensemble_median.nc - GloSAT analysis ensemble median
 * GloSATref.1.0.0.0.noninfilled.anomalies.ensemble_median.nc - GloSAT non-infilled ensemble median
 * GloSATref.1.0.0.0.analysis.anomalies.*.nc - the ensemble gridded data
 * GloSATref.1.0.0.0.analysis.component_series.global.monthly.nc - the time series from GloSAT
-* HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.nc - the time series from HadCRUT5
-* HadCRUT.5.0.2.0.analysis.anomalies.*.nc - the ensemble gridded version of HadCRUT
-* tas_historical1750_UKESM1-1LL_r*i1p1_175001-201412.nc
-* tas_Amon_HadCM3_DataAssimilationMean_r1i1p1_17812008.nc
-* tas_Amon_HadCM3_FreeRunning_r*i1p1_178012-200912.nc
+* HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.nc - the time series from HadCRUT5 from https://www.metoffice.gov.uk/hadobs/hadcrut5/data/HadCRUT.5.0.2.0/analysis/diagnostics/HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.csv
+* HadCRUT.5.0.2.0.analysis.anomalies.*.nc - the ensemble gridded version of HadCRUT from https://www.metoffice.gov.uk/hadobs/hadcrut5/data/HadCRUT.5.0.2.0/download.html
+* tas_historical1750_UKESM1-1LL_r*i1p1_175001-201412.nc - Provided by Andrew Schurer
+* tas_Amon_HadCM3_DataAssimilationMean_r1i1p1_17812008.nc - https://doi.org/10.7488/ds/3829 as used in https://doi.org/10.5194/cp-19-943-2023
+* tas_Amon_HadCM3_FreeRunning_r*i1p1_178012-200912.nc - https://doi.org/10.7488/ds/3827 as used in https://doi.org/10.5194/cp-19-943-2023
+
+Andrew Schurer emailed me some data and I've included these and a couple of other files in the repository:
+
+* solar_erf.csv
+* volcanic_erf.csv
+* tas_summary.csv
 
 Once all the data are in place you can run the individual scripts by typing something like the following at the command 
 line:
