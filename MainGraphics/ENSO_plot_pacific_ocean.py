@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     # From https://www.metoffice.gov.uk/hadobs/hadisst/data/HadISST_sst.nc.gz
     # Load the HadISST NetCDF dataset
-    file_path = Path('InputData') / 'ManagedData' / 'Data' / 'HadISST' / 'HadISST_sst.nc'
+    file_path = Path('InputData') / 'HadISST_sst.nc'
     ds = xr.open_dataset(file_path)
 
     # Select the SST variable

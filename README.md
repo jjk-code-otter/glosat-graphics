@@ -9,6 +9,8 @@ variability. Running is simple, assuming you have all the packages installed, ty
 
 `python variability_schematic_tim.py`
 
+There's another script in there, but it's not as good. It's run pretty much the same way.
+
 # Timeline plotting
 
 This is a tool for plotting labels and images. The code needs a json file and a set of images in the same directory. 

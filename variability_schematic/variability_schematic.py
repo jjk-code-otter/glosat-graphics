@@ -194,121 +194,123 @@ def make_bias_error(nx, ny):
 
     return data_grid
 
-# Make fonts in pdf and svg render correctly in other programs
-matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['svg.fonttype'] = 'none'
+if __name__ == '__main__':
 
-seed = 45234573570987982
-rng = np.random.default_rng(seed)
+    # Make fonts in pdf and svg render correctly in other programs
+    matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
 
-# Set grid size
-nx = 100
-ny = 100
+    seed = 45234573570987982
+    rng = np.random.default_rng(seed)
 
-# Plot parameters
-ypos_text = 103
-cmap_real = plt.cm.BuPu_r
-cmap_artificial = plt.cm.YlOrBr_r
-cmap_diverge = plt.cm.plasma
+    # Set grid size
+    nx = 100
+    ny = 100
 
-mid = int(nx / 2)
+    # Plot parameters
+    ypos_text = 103
+    cmap_real = plt.cm.BuPu_r
+    cmap_artificial = plt.cm.YlOrBr_r
+    cmap_diverge = plt.cm.plasma
 
-# Generate the different components of real variability
-corr_noise_grid = make_correlated_noise(rng, nx, ny, 0.1, 4, 12)
-trend_grid = quad_trend_grid(nx, ny)
-trend_grid = trend_grid - np.mean(trend_grid)
+    mid = int(nx / 2)
 
-periodic = make_periodic_grid(nx, ny, 0.05, 5)
+    # Generate the different components of real variability
+    corr_noise_grid = make_correlated_noise(rng, nx, ny, 0.1, 4, 12)
+    trend_grid = quad_trend_grid(nx, ny)
+    trend_grid = trend_grid - np.mean(trend_grid)
 
-# and artificial variability
-outliers = make_outliers(rng, nx, ny, 1.8, 0.25)
-white_noise = make_white_noise(rng, nx, ny, 0.1)
-bias = make_bias_error(nx, ny)
-sampling = make_sampling(rng, nx, ny, 1.0)
+    periodic = make_periodic_grid(nx, ny, 0.05, 5)
 
-# Start the plot
-fig, axs = plt.subplots(3, 6)
-fig.set_size_inches(18, 9)
+    # and artificial variability
+    outliers = make_outliers(rng, nx, ny, 1.8, 0.25)
+    white_noise = make_white_noise(rng, nx, ny, 0.1)
+    bias = make_bias_error(nx, ny)
+    sampling = make_sampling(rng, nx, ny, 1.0)
 
-# Set parameters for each plot so there are no axes, no tick marks and no labels
-for i, j in itertools.product(range(3), range(6)):
-    axs[i, j].tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False,
-                          labelbottom=False, labeltop=False, labelleft=False, labelright=False)
-    if j in [1, 3, 5]:
-        axs[i, j].set_axis_off()
+    # Start the plot
+    fig, axs = plt.subplots(3, 6)
+    fig.set_size_inches(18, 9)
 
-# Actual variability
-axs[0, 0].pcolormesh(trend_grid, cmap=cmap_real)
-axs[0, 1].plot(trend_grid[mid, :], color=cmap_real(0.5))
-axs[0, 0].text(1, ypos_text, 'Trend, slow variations', fontsize=18)
-axs[0, 0].text(100, 125, 'Real variability', fontsize=24, ha='center')
+    # Set parameters for each plot so there are no axes, no tick marks and no labels
+    for i, j in itertools.product(range(3), range(6)):
+        axs[i, j].tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False,
+                              labelbottom=False, labeltop=False, labelleft=False, labelright=False)
+        if j in [1, 3, 5]:
+            axs[i, j].set_axis_off()
 
-axs[1, 0].pcolormesh(corr_noise_grid, cmap=cmap_real)
-axs[1, 1].plot(corr_noise_grid[mid, :], color=cmap_real(0.5))
-axs[1, 0].text(1, ypos_text, 'Internal variability', fontsize=18)
+    # Actual variability
+    axs[0, 0].pcolormesh(trend_grid, cmap=cmap_real)
+    axs[0, 1].plot(trend_grid[mid, :], color=cmap_real(0.5))
+    axs[0, 0].text(1, ypos_text, 'Trend, slow variations', fontsize=18)
+    axs[0, 0].text(100, 125, 'Real variability', fontsize=24, ha='center')
 
-axs[2, 0].pcolormesh(periodic, cmap=cmap_real)
-axs[2, 1].plot(periodic[mid, :], color=cmap_real(0.5))
-axs[2, 0].text(1, ypos_text, 'Periodic variability', fontsize=18)
+    axs[1, 0].pcolormesh(corr_noise_grid, cmap=cmap_real)
+    axs[1, 1].plot(corr_noise_grid[mid, :], color=cmap_real(0.5))
+    axs[1, 0].text(1, ypos_text, 'Internal variability', fontsize=18)
 
-# Middle columns - combined variability
-combined = trend_grid + corr_noise_grid + periodic
-combined2 = trend_grid + periodic
+    axs[2, 0].pcolormesh(periodic, cmap=cmap_real)
+    axs[2, 1].plot(periodic[mid, :], color=cmap_real(0.5))
+    axs[2, 0].text(1, ypos_text, 'Periodic variability', fontsize=18)
 
-vmin = -0.5
-vmax = 0.5
+    # Middle columns - combined variability
+    combined = trend_grid + corr_noise_grid + periodic
+    combined2 = trend_grid + periodic
 
-# For real variability show separate cumulative combination as light overlay
-axs[0, 2].pcolormesh(combined, vmin=vmin, vmax=vmax, cmap=cmap_real)
-axs[0, 3].plot(combined[mid, :], color=cmap_real(0.5))
-axs[0, 3].plot(trend_grid[mid, :], color=cmap_real(0.5), alpha=0.2)
-axs[0, 3].plot(combined2[mid, :], color=cmap_real(0.5), alpha=0.2)
-axs[0, 2].text(1, ypos_text, 'Combined real variability', fontsize=18)
+    vmin = -0.5
+    vmax = 0.5
 
-combined_error = outliers + white_noise + bias
+    # For real variability show separate cumulative combination as light overlay
+    axs[0, 2].pcolormesh(combined, vmin=vmin, vmax=vmax, cmap=cmap_real)
+    axs[0, 3].plot(combined[mid, :], color=cmap_real(0.5))
+    axs[0, 3].plot(trend_grid[mid, :], color=cmap_real(0.5), alpha=0.2)
+    axs[0, 3].plot(combined2[mid, :], color=cmap_real(0.5), alpha=0.2)
+    axs[0, 2].text(1, ypos_text, 'Combined real variability', fontsize=18)
 
-axs[1, 2].pcolormesh(combined_error, vmin=vmin, vmax=vmax, cmap=cmap_artificial)
-axs[1, 3].plot(combined_error[mid, :], color=cmap_artificial(0.5))
-axs[1, 2].text(1, ypos_text, 'Combined artificial variability', fontsize=18)
+    combined_error = outliers + white_noise + bias
 
-# Adjust the y-position of the individual combined plots so they are more central
-for i, j in itertools.product(range(0, 2), range(2, 4)):
-    pos = axs[i, j].get_position()
-    pos.y0 = pos.y0 - 0.125 + 0.0625 - i * 0.125
-    pos.y1 = pos.y1 - 0.125 + 0.0625 - i * 0.125
-    axs[i, j].set_position(pos)
+    axs[1, 2].pcolormesh(combined_error, vmin=vmin, vmax=vmax, cmap=cmap_artificial)
+    axs[1, 3].plot(combined_error[mid, :], color=cmap_artificial(0.5))
+    axs[1, 2].text(1, ypos_text, 'Combined artificial variability', fontsize=18)
 
-combined_everything = combined + combined_error + sampling
+    # Adjust the y-position of the individual combined plots so they are more central
+    for i, j in itertools.product(range(0, 2), range(2, 4)):
+        pos = axs[i, j].get_position()
+        pos.y0 = pos.y0 - 0.125 + 0.0625 - i * 0.125
+        pos.y1 = pos.y1 - 0.125 + 0.0625 - i * 0.125
+        axs[i, j].set_position(pos)
 
-axs[2, 2].pcolormesh(combined_everything, vmin=vmin, vmax=vmax, cmap=cmap_diverge)
-axs[2, 3].plot(combined_everything[mid, :], color=cmap_diverge(0.5))
-axs[2, 2].text(1, ypos_text, 'Observed variability and sampling', fontsize=18)
+    combined_everything = combined + combined_error + sampling
 
-# Adjust y-position of the combined plots so they appear below the level of the others
-for j in range(2, 4):
-    pos = axs[2, j].get_position()
-    pos.y0 = pos.y0 - 0.25
-    pos.y1 = pos.y1 - 0.25
-    axs[2, j].set_position(pos)
+    axs[2, 2].pcolormesh(combined_everything, vmin=vmin, vmax=vmax, cmap=cmap_diverge)
+    axs[2, 3].plot(combined_everything[mid, :], color=cmap_diverge(0.5))
+    axs[2, 2].text(1, ypos_text, 'Observed variability and sampling', fontsize=18)
 
-# Artificial variability
-axs[0, 4].pcolormesh(outliers, cmap=cmap_artificial)
-axs[0, 5].plot(outliers[mid, :], color=cmap_artificial(0.5))
-axs[0, 4].text(1, ypos_text, 'Outliers, transcription errors', fontsize=18)
-axs[0, 4].text(100, 125, 'Artificial variability', fontsize=24, ha='center')
+    # Adjust y-position of the combined plots so they appear below the level of the others
+    for j in range(2, 4):
+        pos = axs[2, j].get_position()
+        pos.y0 = pos.y0 - 0.25
+        pos.y1 = pos.y1 - 0.25
+        axs[2, j].set_position(pos)
 
-axs[1, 4].pcolormesh(white_noise, cmap=cmap_artificial)
-axs[1, 5].plot(white_noise[mid, :], color=cmap_artificial(0.5))
-axs[1, 4].text(1, ypos_text, 'Noise', fontsize=18)
+    # Artificial variability
+    axs[0, 4].pcolormesh(outliers, cmap=cmap_artificial)
+    axs[0, 5].plot(outliers[mid, :], color=cmap_artificial(0.5))
+    axs[0, 4].text(1, ypos_text, 'Outliers, transcription errors', fontsize=18)
+    axs[0, 4].text(100, 125, 'Artificial variability', fontsize=24, ha='center')
 
-axs[2, 4].pcolormesh(bias, cmap=cmap_artificial)
-axs[2, 5].plot(bias[mid, :], color=cmap_artificial(0.5))
-axs[2, 4].text(1, ypos_text, 'Observational biases', fontsize=18)
+    axs[1, 4].pcolormesh(white_noise, cmap=cmap_artificial)
+    axs[1, 5].plot(white_noise[mid, :], color=cmap_artificial(0.5))
+    axs[1, 4].text(1, ypos_text, 'Noise', fontsize=18)
 
-plt.savefig('variability_schematic.png', bbox_inches='tight', dpi=50)
+    axs[2, 4].pcolormesh(bias, cmap=cmap_artificial)
+    axs[2, 5].plot(bias[mid, :], color=cmap_artificial(0.5))
+    axs[2, 4].text(1, ypos_text, 'Observational biases', fontsize=18)
 
-# If higher resolution is needed, you can change the dpi or use the svg option below. File size is large ~18 Mbytes
-plt.savefig('variability_schematic.svg', bbox_inches='tight')
-plt.savefig('variability_schematic.pdf', bbox_inches='tight')
+    plt.savefig('variability_schematic.png', bbox_inches='tight', dpi=50)
 
-plt.close()
+    # If higher resolution is needed, you can change the dpi or use the svg option below. File size is large ~18 Mbytes
+    plt.savefig('variability_schematic.svg', bbox_inches='tight')
+    plt.savefig('variability_schematic.pdf', bbox_inches='tight')
+
+    plt.close()
