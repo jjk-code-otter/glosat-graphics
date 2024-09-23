@@ -61,5 +61,6 @@ MANIFEST
 *.csv
 !solar_erf.csv
 !volcanic_erf.csv
+!tas_summary.csv
 *.nc
 *.txt

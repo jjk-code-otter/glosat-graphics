@@ -1,0 +1,254 @@
+Conventions,G,BADC-CSV,1
+title,G,Global mean temperature
+last_revised_date,G,2024-03-21
+date_valid,G,2024-03-21
+feature_type,G,area average
+creator,G,WMO
+source,G,Produced by climind version 1.0
+observation_station,G,derived data
+location,G,90.,-180.,-90.,180.
+rights,G,TBD
+activity,G,WMO
+comments,G,Format description https://help.ceda.ac.uk/article/105-badc-csv
+history,Berkeley_Earth,"Data set created from file ['Land_and_Ocean_complete.txt'] downloaded from ['https://berkeley-earth-temperature.s3.us-west-1.amazonaws.com/Global/Land_and_Ocean_complete.txt'] at ['2024-01-17 10:10:45']"
+history,Berkeley_Earth,"Rebaselined to 1981-2010 for each month separately by calculating the arithmetic mean of the data over the baseline period and subtracting the mean from all data values. This is done for each month separately (Januarys, Februarys etc)."
+history,Berkeley_Earth,"Calculated annual average from monthly averages using arithmetic mean"
+history,Berkeley_Earth,"Selected years within the range 1850 to 2023."
+history,Berkeley_Earth,"Added offset of 0.69 to all data values."
+history,Berkeley_Earth,"Manually changed baseline to 1850-1900. Note that data values remain unchanged."
+reference,Berkeley_Earth,"Rohde, R. A. and Hausfather, Z.: The Berkeley Earth Land/Ocean Temperature Record, Earth Syst. Sci. Data, 12, 3469-3479, https://doi.org/10.5194/essd-12-3469-2020, 2020"
+comments,Berkeley_Earth,"Original data acknowledgement: "
+history,ERA5,"Data set created from file ['ts_1month_anomaly_Global_ERA5_2t_202312_1991-2020_v01.1.csv'] downloaded from ['https://climate.copernicus.eu/sites/default/files/ftp-data/temperature/2023/12/ERA5_1991-2020/ts_1month_anomaly_Global_ERA5_2t_202312_1991-2020_v01.1.csv'] at ['2024-01-05 08:43:31']"
+history,ERA5,"Rebaselined to 1981-2010 for each month separately by calculating the arithmetic mean of the data over the baseline period and subtracting the mean from all data values. This is done for each month separately (Januarys, Februarys etc)."
+history,ERA5,"Calculated annual average from monthly averages using arithmetic mean"
+history,ERA5,"Selected years within the range 1850 to 2023."
+history,ERA5,"Added offset of 0.69 to all data values."
+history,ERA5,"Manually changed baseline to 1850-1900. Note that data values remain unchanged."
+reference,ERA5,"Hersbach H, Bell B, Berrisford P et al. 2020. The ERA5 global reanalysis. Q. J. R. Meteorol. Soc. 146: 1999-2049. https://doi.org/10.1002/qj.3803"
+comments,ERA5,"Original data acknowledgement: Contains using Copernicus Climate Change Service information [2024]. Neither the European Commission nor ECMWF is responsible for any use that may be made of the Copernicus information or data it contains."
+history,GISTEMP,"Data set created from file ['GLB.Ts+dSST.csv'] downloaded from ['https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv'] at ['2024-01-06 11:31:29']"
+history,GISTEMP,"Rebaselined to 1981-2010 for each month separately by calculating the arithmetic mean of the data over the baseline period and subtracting the mean from all data values. This is done for each month separately (Januarys, Februarys etc)."
+history,GISTEMP,"Calculated annual average from monthly averages using arithmetic mean"
+history,GISTEMP,"Selected years within the range 1850 to 2023."
+history,GISTEMP,"Added offset of 0.69 to all data values."
+history,GISTEMP,"Manually changed baseline to 1850-1900. Note that data values remain unchanged."
+reference,GISTEMP,"Lenssen, N., G. Schmidt, J. Hansen, M. Menne, A. Persin, R. Ruedy, and D. Zyss, 2019: Improvements in the GISTEMP uncertainty model. J. Geophys. Res. Atmos., 124, no. 12, 6307-6326, doi:10.1029/2018JD029522"
+comments,GISTEMP,"Original data acknowledgement: "
+history,HadCRUT5,"Data set created from file ['HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.csv', 'HadCRUT.5.0.2.0.analysis.summary_series.global.annual.csv'] downloaded from ['https://www.metoffice.gov.uk/hadobs/hadcrut5/data/HadCRUT.5.0.2.0/analysis/diagnostics/HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.csv', 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/HadCRUT.5.0.2.0/analysis/diagnostics/HadCRUT.5.0.2.0.analysis.summary_series.global.annual.csv'] at ['2024-01-10 16:55:47', '2023-12-27 19:14:45']"
+history,HadCRUT5,"Rebaselined to 1981-2010 for each month separately by calculating the arithmetic mean of the data over the baseline period and subtracting the mean from all data values. This is done for each month separately (Januarys, Februarys etc)."
+history,HadCRUT5,"Calculated annual average from monthly averages using arithmetic mean"
+history,HadCRUT5,"Selected years within the range 1850 to 2023."
+history,HadCRUT5,"Added offset of 0.69 to all data values."
+history,HadCRUT5,"Manually changed baseline to 1850-1900. Note that data values remain unchanged."
+reference,HadCRUT5,"Morice, C. P., Kennedy, J. J., Rayner, N. A., Winn, J. P., Hogan, E., Killick, R. E., et al. (2021). An updated assessment of near-surface temperature change from 1850: the HadCRUT5 data set. Journal of Geophysical Research: Atmospheres, 126, e2019JD032361. https://doi.org/10.1029/2019JD032361"
+comments,HadCRUT5,"Original data acknowledgement: HadCRUT.5.0.2.0 data were obtained from http://www.metoffice.gov.uk/hadobs/hadcrut5 on 2024-01-10 16:55:47 and are © British Crown Copyright, Met Office 2024, provided under an Open Government License, http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+history,JRA-55,"Data set created from file ['JRA-55_tmp2m_global_ts_Clim8110.txt'] downloaded from [''] at ['2024-01-05 11:44:00']"
+history,JRA-55,"Rebaselined to 1981-2010 for each month separately by calculating the arithmetic mean of the data over the baseline period and subtracting the mean from all data values. This is done for each month separately (Januarys, Februarys etc)."
+history,JRA-55,"Calculated annual average from monthly averages using arithmetic mean"
+history,JRA-55,"Selected years within the range 1850 to 2023."
+history,JRA-55,"Added offset of 0.69 to all data values."
+history,JRA-55,"Manually changed baseline to 1850-1900. Note that data values remain unchanged."
+reference,JRA-55,"Kobayashi, S., Ota, Y., Harada, Y., Ebita, A., Moriya, M., Onoda, H., Onogi, K., Kamahori, H., Kobayashi, C., Endo, H. and Miyaoka, K., (2015). The JRA-55 reanalysis: General specifications and basic characteristics. Journal of the Meteorological Society of Japan. Ser. II, 93(1), pp.5-48."
+comments,JRA-55,"Original data acknowledgement: "
+history,NOAA_Interim,"Data set created from file ['aravg.mon.land_ocean.90S.90N.v5.1.0.202312.asc', 'aravg.ann.land_ocean.90S.90N.*.asc'] downloaded from ['https://www.ncei.noaa.gov/data/noaa-global-surface-temperature/v5.1/access/timeseries/aravg.mon.land_ocean.90S.90N.v5.1.0.202312.asc', 'https://www.ncei.noaa.gov/data/noaa-global-surface-temperature/v5.1/access/timeseries/aravg.ann.land_ocean.90S.90N.*.asc'] at ['2024-01-17 10:10:47']"
+history,NOAA_Interim,"Rebaselined to 1981-2010 for each month separately by calculating the arithmetic mean of the data over the baseline period and subtracting the mean from all data values. This is done for each month separately (Januarys, Februarys etc)."
+history,NOAA_Interim,"Calculated annual average from monthly averages using arithmetic mean"
+history,NOAA_Interim,"Selected years within the range 1850 to 2023."
+history,NOAA_Interim,"Added offset of 0.69 to all data values."
+history,NOAA_Interim,"Manually changed baseline to 1850-1900. Note that data values remain unchanged."
+reference,NOAA_Interim,"Vose, R.S., B. Huang, X. Yin., D. Arndt, D.R. Easterling, J.H. Lawrimore, M.J. Menne, A. Sanchez-Lugo, H.-M. Zhang, 2021: Implementing full spatial coverage in NOAA’s global temperature analysis. Geophysical Research Letters, 48, e2020GL090873. https://doi.org/10.1029/2020GL090873"
+comments,NOAA_Interim,"Original data acknowledgement: "
+long_name,time,time,days since 1800-01-01 00:00:00.0
+type,time,int
+long_name,year,year,1
+type,year,int
+long_name,Berkeley_Earth,tas,degC
+type,Berkeley_Earth,float
+long_name,ERA5,tas,degC
+type,ERA5,float
+long_name,GISTEMP,tas,degC
+type,GISTEMP,float
+long_name,HadCRUT5,tas,degC
+type,HadCRUT5,float
+long_name,JRA-55,tas,degC
+type,JRA-55,float
+long_name,NOAA_Interim,tas,degC
+type,NOAA_Interim,float
+coordinate_variable,time,t
+data
+time,year,Berkeley_Earth,ERA5,GISTEMP,HadCRUT5,JRA-55,NOAA_Interim
+18262,1850,-0.2135,,,-0.0776,,0.0725
+18627,1851,-0.0999,,,0.1068,,0.1539
+18992,1852,-0.0753,,,0.1107,,0.1436
+19358,1853,-0.0792,,,0.0698,,0.1262
+19723,1854,-0.0670,,,0.0486,,0.1330
+20088,1855,-0.0600,,,0.0432,,0.1278
+20453,1856,-0.1801,,,0.0198,,-0.0057
+20819,1857,-0.3186,,,-0.1271,,-0.0327
+21184,1858,-0.1127,,,-0.0487,,0.0311
+21549,1859,0.0003,,,0.0589,,0.1558
+21914,1860,-0.1533,,,-0.0500,,0.0113
+22280,1861,-0.2262,,,-0.0890,,-0.0089
+22645,1862,-0.3361,,,-0.1963,,-0.0578
+23010,1863,-0.1003,,,-0.0041,,0.0900
+23375,1864,-0.1352,,,-0.1253,,0.0554
+23741,1865,-0.0364,,,0.0076,,0.1194
+24106,1866,0.0062,,,-0.0012,,0.1454
+24471,1867,0.0472,,,-0.0169,,0.0710
+24836,1868,0.0016,,,-0.0117,,0.1106
+25202,1869,-0.0058,,,0.0235,,0.1332
+25567,1870,-0.0737,,,0.0122,,0.0803
+25932,1871,-0.1049,,,-0.0284,,0.0790
+26297,1872,-0.0715,,,0.0120,,0.0734
+26663,1873,-0.0386,,,-0.0012,,0.0560
+27028,1874,-0.0857,,,-0.0331,,0.0376
+27393,1875,-0.1216,,,-0.0355,,0.0454
+27758,1876,-0.1272,,,-0.0840,,0.0279
+28124,1877,0.2601,,,0.2390,,0.2945
+28489,1878,0.3444,,,0.3288,,0.3021
+28854,1879,-0.0079,,,0.0365,,0.1302
+29219,1880,-0.0763,,0.0995,0.0243,,0.0746
+29585,1881,0.0410,,0.1811,0.1079,,0.1156
+29950,1882,-0.0262,,0.1586,0.0446,,0.1176
+30315,1883,-0.0758,,0.0928,-0.0064,,0.0224
+30680,1884,-0.2488,,-0.0164,-0.1522,,-0.0658
+31046,1885,-0.2110,,-0.0664,-0.1310,,-0.0790
+31411,1886,-0.2423,,-0.0464,-0.0808,,-0.0105
+31776,1887,-0.2743,,-0.0964,-0.1587,,-0.0651
+32141,1888,-0.0709,,0.0953,-0.0393,,0.0746
+32507,1889,0.0529,,0.1620,0.0902,,0.1658
+32872,1890,-0.2341,,-0.0855,-0.1667,,-0.0321
+33237,1891,-0.1179,,0.0445,-0.0612,,0.0577
+33602,1892,-0.1789,,-0.0030,-0.1674,,-0.0095
+33968,1893,-0.1556,,-0.0422,-0.1545,,-0.0729
+34333,1894,-0.1456,,-0.0330,-0.1436,,0.0135
+34698,1895,-0.0806,,0.0445,-0.1086,,0.0534
+35063,1896,0.0103,,0.1595,0.0561,,0.1838
+35429,1897,0.0275,,0.1645,0.0803,,0.1705
+35794,1898,-0.1819,,-0.0039,-0.1457,,0.0164
+36159,1899,-0.0122,,0.0970,-0.0153,,0.0846
+36524,1900,0.0964,,0.1928,0.1056,,0.1621
+36889,1901,0.0165,,0.1186,0.0467,,0.1114
+37254,1902,-0.1403,,-0.0080,-0.0988,,0.0140
+37619,1903,-0.2393,,-0.0997,-0.1932,,-0.0728
+37984,1904,-0.2973,,-0.2005,-0.2574,,-0.1880
+38350,1905,-0.1150,,0.0078,-0.0677,,0.0010
+38715,1906,-0.0288,,0.0478,0.0210,,0.0372
+39080,1907,-0.2009,,-0.1172,-0.1640,,-0.0918
+39445,1908,-0.2237,,-0.1572,-0.1737,,-0.1565
+39811,1909,-0.2866,,-0.2147,-0.1956,,-0.1907
+40176,1910,-0.2447,,-0.1680,-0.1908,,-0.1527
+40541,1911,-0.2566,,-0.1764,-0.1990,,-0.1666
+40906,1912,-0.1886,,-0.0980,-0.1354,,-0.0862
+41272,1913,-0.1601,,-0.0722,-0.1269,,-0.0815
+41637,1914,0.0271,,0.1220,0.0777,,0.1003
+42002,1915,0.0819,,0.1320,0.1484,,0.1442
+42367,1916,-0.1551,,-0.0897,-0.0799,,-0.0687
+42733,1917,-0.3024,,-0.1889,-0.2027,,-0.1920
+43098,1918,-0.1382,,-0.0247,-0.0842,,-0.0416
+43463,1919,-0.0758,,-0.0055,0.0148,,0.0023
+43828,1920,-0.0195,,-0.0005,0.0418,,-0.0087
+44194,1921,0.0377,,0.0853,0.0997,,0.0698
+44559,1922,-0.0463,,-0.0105,0.0011,,-0.0055
+44924,1923,-0.0120,,0.0086,0.0224,,0.0001
+45289,1924,-0.0218,,0.0011,0.0283,,0.0177
+45655,1925,0.0206,,0.0520,0.0580,,0.0435
+46020,1926,0.1548,,0.1636,0.2176,,0.1572
+46385,1927,0.0378,,0.0545,0.1110,,0.0626
+46750,1928,0.0492,,0.0686,0.1336,,0.0757
+47116,1929,-0.1371,,-0.0897,-0.0523,,-0.0652
+47481,1930,0.0913,,0.1136,0.1633,,0.1314
+47846,1931,0.1556,,0.1795,0.2367,,0.1834
+48211,1932,0.1144,,0.1136,0.1947,,0.1228
+48577,1933,-0.0779,,-0.0139,0.0178,,-0.0074
+48942,1934,0.0715,,0.1495,0.1658,,0.1387
+49307,1935,0.0107,,0.0736,0.1341,,0.0899
+49672,1936,0.0795,,0.1270,0.1706,,0.1255
+50038,1937,0.2368,,0.2436,0.3209,,0.2539
+50403,1938,0.2430,,0.2703,0.3279,,0.2598
+50768,1939,0.2219,,0.2545,0.2993,,0.2502
+51133,1940,0.3050,0.1963,0.3945,0.4161,,0.3972
+51499,1941,0.2600,0.2430,0.4545,0.3782,,0.4626
+51864,1942,0.2696,0.1505,0.3378,0.3415,,0.3307
+52229,1943,0.3236,0.1563,0.3603,0.3465,,0.3413
+52594,1944,0.4273,0.3480,0.4753,0.4842,,0.4768
+52960,1945,0.3005,0.2080,0.3628,0.3832,,0.3803
+53325,1946,0.1543,0.2121,0.1986,0.2213,,0.2033
+53690,1947,0.2241,0.2563,0.2453,0.2489,,0.2347
+54055,1948,0.1302,0.1946,0.1628,0.2155,,0.1808
+54421,1949,0.1205,0.2280,0.1586,0.1963,,0.1841
+54786,1950,0.0562,0.1163,0.0953,0.1135,,0.1192
+55151,1951,0.2364,0.2480,0.1995,0.2790,,0.2364
+55516,1952,0.3086,0.2338,0.2786,0.3555,,0.2973
+55882,1953,0.3829,0.3105,0.3478,0.4177,,0.3726
+56247,1954,0.1867,0.1130,0.1345,0.2234,,0.1745
+56612,1955,0.1363,0.0955,0.1270,0.1428,,0.1160
+56977,1956,0.0547,0.0355,0.0786,0.0769,,0.0746
+57343,1957,0.2832,0.2838,0.3161,0.3048,,0.3037
+57708,1958,0.2878,0.3496,0.3303,0.3225,0.4135,0.3293
+58073,1959,0.2703,0.3155,0.2986,0.2921,0.3470,0.3159
+58438,1960,0.2132,0.2705,0.2428,0.2247,0.3291,0.2711
+58804,1961,0.2902,0.3455,0.3261,0.3201,0.3531,0.3102
+59169,1962,0.2315,0.2855,0.2986,0.2761,0.3391,0.2974
+59534,1963,0.2740,0.3230,0.3236,0.3033,0.3411,0.3278
+59899,1964,0.0074,0.1113,0.0695,0.0343,0.1444,0.0958
+60265,1965,0.1262,0.1738,0.1611,0.1357,0.2156,0.1836
+60630,1966,0.1889,0.2496,0.2103,0.1912,0.2484,0.2244
+60995,1967,0.2193,0.2638,0.2445,0.2226,0.2451,0.2606
+61360,1968,0.1424,0.2030,0.1845,0.1715,0.2169,0.1875
+61726,1969,0.2922,0.3321,0.3203,0.3087,0.3659,0.3398
+62091,1970,0.2442,0.3080,0.2936,0.2551,0.3247,0.2999
+62456,1971,0.1247,0.1538,0.1861,0.1342,0.1989,0.1935
+62821,1972,0.2346,0.2871,0.2761,0.2463,0.3092,0.2705
+63187,1973,0.3716,0.3913,0.4270,0.3901,0.4079,0.4431
+63552,1974,0.1668,0.1171,0.1961,0.1676,0.1387,0.1954
+63917,1975,0.2325,0.1405,0.2536,0.2294,0.1999,0.2598
+64282,1976,0.1352,0.0713,0.1686,0.1243,0.0923,0.2132
+64648,1977,0.4644,0.3563,0.4445,0.4432,0.3682,0.4544
+65013,1978,0.3394,0.2988,0.3361,0.3454,0.3066,0.3596
+65378,1979,0.4148,0.4539,0.4328,0.4310,0.4234,0.4689
+65743,1980,0.5378,0.5852,0.5253,0.5362,0.5488,0.5370
+66109,1981,0.5880,0.6185,0.5903,0.5901,0.5879,0.5989
+66474,1982,0.3727,0.4193,0.4061,0.3744,0.4014,0.4353
+66839,1983,0.5531,0.6141,0.5786,0.5639,0.5839,0.5921
+67204,1984,0.3852,0.4015,0.4245,0.3881,0.3963,0.4408
+67570,1985,0.3816,0.3611,0.3845,0.3898,0.3651,0.4126
+67935,1986,0.4367,0.4499,0.4478,0.4358,0.4639,0.4605
+68300,1987,0.5752,0.6053,0.5886,0.5831,0.6033,0.5819
+68665,1988,0.6200,0.6374,0.6570,0.6223,0.6292,0.6611
+69031,1989,0.5056,0.5191,0.5403,0.5194,0.5209,0.5403
+69396,1990,0.6932,0.7505,0.7136,0.7007,0.7088,0.6926
+69761,1991,0.6817,0.6957,0.6728,0.6790,0.6638,0.6639
+70126,1992,0.4735,0.4637,0.4903,0.4650,0.4718,0.4796
+70492,1993,0.5297,0.5095,0.4995,0.5058,0.5082,0.5147
+70857,1994,0.5797,0.5458,0.5820,0.5737,0.5781,0.5691
+71222,1995,0.7373,0.7236,0.7128,0.7170,0.7517,0.7254
+71587,1996,0.6273,0.5936,0.6020,0.6168,0.6207,0.6041
+71953,1997,0.7672,0.7158,0.7311,0.7624,0.7339,0.7452
+72318,1998,0.9174,0.9044,0.8753,0.9175,0.9306,0.8759
+72683,1999,0.6748,0.6356,0.6486,0.6646,0.6833,0.6667
+73048,2000,0.6755,0.6305,0.6620,0.6712,0.6841,0.6754
+73414,2001,0.8096,0.7905,0.8036,0.8294,0.8141,0.7982
+73779,2002,0.9025,0.8872,0.8953,0.8836,0.9187,0.8690
+74144,2003,0.8851,0.8742,0.8870,0.8843,0.8730,0.8784
+74509,2004,0.7975,0.8129,0.8011,0.8075,0.7833,0.7908
+74875,2005,0.9627,0.9751,0.9428,0.9470,0.9608,0.9485
+75240,2006,0.9118,0.9270,0.9053,0.9127,0.9123,0.9069
+75605,2007,0.9262,0.9196,0.9328,0.9318,0.9064,0.9007
+75970,2008,0.7974,0.7871,0.8095,0.8058,0.7629,0.7917
+76336,2009,0.9316,0.9178,0.9228,0.9369,0.9015,0.9046
+76701,2010,1.0004,1.0135,0.9920,1.0205,0.9800,0.9749
+77066,2011,0.8920,0.8716,0.8778,0.8778,0.8631,0.8717
+77431,2012,0.9112,0.9228,0.9161,0.9177,0.9053,0.9049
+77797,2013,0.9308,0.9500,0.9453,0.9637,0.9437,0.9280
+78162,2014,1.0042,0.9893,1.0136,1.0130,0.9849,1.0099
+78527,2015,1.1489,1.1387,1.1653,1.1652,1.1170,1.1600
+78892,2016,1.2857,1.3223,1.2845,1.2730,1.3015,1.2766
+79258,2017,1.1887,1.2267,1.1920,1.1853,1.1665,1.1939
+79623,2018,1.1133,1.1470,1.1170,1.1028,1.0827,1.1065
+79988,2019,1.2493,1.2823,1.2453,1.2312,1.2396,1.2243
+80353,2020,1.2759,1.3153,1.2820,1.2630,1.2347,1.2571
+80719,2021,1.1209,1.1568,1.1161,1.1020,1.0813,1.1062
+81084,2022,1.1636,1.1839,1.1595,1.1414,1.1296,1.1525
+81449,2023,1.4535,1.4838,1.4386,1.4405,1.4341,1.4260
+end data
