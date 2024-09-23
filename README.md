@@ -48,7 +48,8 @@ serve the files so they're not available directly. To run type the following at 
 `python get_data.py`
 
 Other files are part of the project or represent large quantities of data that you probably want to manage separately. 
-These include:
+I've followed the GloSAT/HadCRUT directory structure for the obs data underneath a main directory specified by the 
+environment variable `$DATADIR`. These include:
 
 * GloSATref.1.0.0.0.analysis.anomalies.ensemble_median.nc - GloSAT analysis ensemble median
 * GloSATref.1.0.0.0.noninfilled.anomalies.ensemble_median.nc - GloSAT non-infilled ensemble median
