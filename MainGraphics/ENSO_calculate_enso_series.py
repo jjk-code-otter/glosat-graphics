@@ -55,7 +55,7 @@ def summarise_ensemble(ensemble):
 
 def get_el_nino_years():
     # Table 2 in Meyers et al. (2006) From  The Years of El Niño, La Niña, and Interactions with the Tropical Indian Ocean.
-    # Journal of Climate
+    # Journal of Climate, extended post 2000 using CPC ONI index
     el_nino_years = [
         1877, 1888, 1896, 1899,
         1902,1905, 1911, 1914, 1918, 1923, 1925, 1930, 1940, 1941,
@@ -67,7 +67,7 @@ def get_el_nino_years():
 
 def get_la_nina_years():
     # Table 2 in Meyers et al. (2006) From  The Years of El Niño, La Niña, and Interactions with the Tropical Indian Ocean.
-    # Journal of Climate
+    # Journal of Climate, extended post 2000 using CPC ONI index
     la_nina_years = [
         1878, 1879, 1886, 1889, 1890, 1892, 1893, 1897,
         1903, 1906, 1909, 1910, 1916, 1917, 1922, 1924, 1928, 1933, 1938, 1942, 1949,
@@ -95,6 +95,11 @@ def plot_rectangles_for_list_of_years(year_list, color):
     for key in el_nino_list:
         plt.fill_between(el_nino_list[key], [-4, -4], [4, 4], color=color, alpha=0.1)
 
+def get_ntime(filename):
+    """Return number of time steps in a specified file"""
+    ds = xa.open_dataset(filename)
+    return ds.time.shape[0]
+
 
 if __name__ == '__main__':
 
@@ -114,11 +119,14 @@ if __name__ == '__main__':
 
     n_ensemble = 200
 
+    ntime_glosat = get_ntime(glosat_dir / f'GloSATref.1.0.0.0.analysis.anomalies.1.nc')
+    ntime_hadcrut = get_ntime(hadcrut_dir / f'HadCRUT.5.0.2.0.analysis.anomalies.1.nc')
+
     glosat_summaries = {}
     hadcrut_summaries = {}
     for area in areas:
-        glosat_summaries[area] = np.zeros((2892, n_ensemble))
-        hadcrut_summaries[area] = np.zeros((2092, n_ensemble))
+        glosat_summaries[area] = np.zeros((ntime_glosat, n_ensemble))
+        hadcrut_summaries[area] = np.zeros((ntime_hadcrut, n_ensemble))
 
     # Calculate area averages from all ensemble members for the specified areas
     for i in range(1, n_ensemble + 1):

@@ -1,3 +1,6 @@
+"""
+Plot maps of the Pacific with composite El Nino and La Nina anomalies
+"""
 import xarray as xr
 import numpy as np
 # import matplotlib.pyplot as plt

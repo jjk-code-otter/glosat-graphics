@@ -1,3 +1,6 @@
+"""
+Plot effective radiative forcings (ERF) for volcanic aerosols and solar.
+"""
 import matplotlib.pyplot as plt
 
 

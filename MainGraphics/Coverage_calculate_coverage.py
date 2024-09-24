@@ -1,5 +1,8 @@
+"""
+Plot the coverage time series for six latitude bands using the non-infilled and analysis datasets to show how
+coverage has changed over time and the effect of infilling.
+"""
 import copy
-
 import xarray as xa
 import os
 from pathlib import Path
@@ -12,11 +15,6 @@ import cartopy.crs as ccrs
 
 
 def plot_map(inarry, filename):
-    wmo_cols = ['#c7e9b4', '#7fcdbb', '#41b6c4', '#1d91c0', '#225ea8', '#253494', '#081d58']
-    wmo_cols = ['#f2f0f7', '#dadaeb', '#bcbddc', '#9e9ac8', '#807dba', '#6a51a3', '#4a1486']
-    # wmo_cols.reverse()
-    wmo_levels = [0, .2, .4, .6, .8, 1.0]
-
     data = inarry.data
     data[data == 0] = np.nan
     inarry.data = data
@@ -32,6 +30,8 @@ def plot_map(inarry, filename):
     fig = plt.figure(figsize=(16, 9))
     ax = fig.add_subplot(111, projection=proj, aspect='auto')
 
+    # Vmin and Vmax aren't set to 0 and 1, which are the limits because we want the bottom of the scale not to be
+    # white and the top of the scale not to be overly dark/saturated.
     p = ax.pcolormesh(wrap_lon, data.latitude, wrap_data[:, :], shading='auto', transform=ccrs.PlateCarree(),
                       cmap=mpl.cm.Purples, vmin=-0.3, vmax=1.7)
 
@@ -75,6 +75,12 @@ def plot_anomaly_map(inarry, filename):
 
 
 def plot_colorbar(filename):
+    """
+    All this to plot a colour bar all on its own
+
+    :param filename:
+    :return:
+    """
     fig, axs = plt.subplots(1)
     fig.subplots_adjust(left=0.0, bottom=0.0, right=1, top=1)
     fig.tight_layout()
@@ -84,17 +90,9 @@ def plot_colorbar(filename):
     axs.spines['right'].set_visible(False)
     axs.spines['bottom'].set_visible(False)
     axs.spines['left'].set_visible(False)
-    plt.tick_params(
-        axis='both',
-        which='both',
-        bottom=False,
-        top=False,
-        left=False,
-        labelbottom=False,
-        labelleft=False
-    )
+    plt.tick_params(axis='both', which='both', bottom=False, top=False, left=False, labelbottom=False, labelleft=False)
     cbar = fig.colorbar(orientation="horizontal", mappable=img)
-    cbar.set_ticks([-2,-1.5,-1.0,-0.5,0,0.5,1,1.5,2])
+    cbar.set_ticks([-2, -1.5, -1.0, -0.5, 0, 0.5, 1, 1.5, 2])
     cbar.set_ticklabels(['', '', '', '', '', '', '', '', ''])
     cbar.outline.set_linewidth(3)
     cbar.ax.tick_params(width=3)
@@ -104,6 +102,13 @@ def plot_colorbar(filename):
 
 
 def coverage_map(data, tag):
+    """
+    Convert non-missing data to one and missing data to zero then plot a series of time averages every 50 years.
+
+    :param data:
+    :param tag:
+    :return:
+    """
     data2 = copy.deepcopy(data)
 
     non_missing = ~np.isnan(data2.data)
@@ -118,6 +123,15 @@ def coverage_map(data, tag):
 
 
 def anomaly_map(data, tag):
+    """
+    Plot a series of time averages of the data in a dataframe.
+
+    :param data: xarray dataframe
+        The dataset to plot
+    :param tag: str
+        a tag to add to the standard filename.
+    :return:
+    """
     data2 = copy.deepcopy(data)
     for year in [1750, 1800, 1850, 1900, 1950, 2000]:
         time_mean = data2.sel(time=slice(f'{year}-01-01', f'{year + 49}-12-31')).mean('time')
@@ -125,6 +139,13 @@ def anomaly_map(data, tag):
 
 
 def areas_map(ds):
+    """
+    Plot a map of the different regions plotted in the coverage timeseries
+
+    :param ds: xarray dataframe
+        It doesn't matter what this is as long as it's global.
+    :return: None
+    """
     data = ds.tas_median
     latsr = np.repeat(np.reshape(data.latitude.data, (36, 1)), 72, axis=1)
     pull_data = data.data[0, :, :]
@@ -173,6 +194,16 @@ def areas_map(ds):
 
 
 def calculate_coverage_timeseries(ds):
+    """
+    Calculate the coverage timeseries in six latitude bands. Timeseries are smoothed using a 12-month running mean.
+
+    :param ds: xarray dataframe
+        Dataframe for which we want to plot coverage
+    :return: (ndarray, ndarray, float)
+        Returns an array containing the times of each data step, an array containing the coverage for each time step
+        in seven different latitude bands (globe, arctic, northern extratropics, northern tropics, southern tropics,
+        southern extratropics, antarctic), and an estimate of the polar area.
+    """
     data = ds.tas_median
     time = ds.time.data
     latsr = xa.ufuncs.deg2rad(data.latitude)
@@ -192,6 +223,7 @@ def calculate_coverage_timeseries(ds):
     polar_area = np.sum(weights[latsr < 65.0])
 
     for i in range(ntime):
+        # For each area, sum the area weighs for non-missing data
         selection = ~np.isnan([data[i, :, :]])
         total_area_globe = np.sum(weights[selection[0, :, :]])
         coverage[i, 0] = total_area_globe
@@ -201,20 +233,20 @@ def calculate_coverage_timeseries(ds):
         coverage[i, 1] = total_area_arctic
 
         selection = ~np.isnan([data[i, :, :]]) & (latsr < 65.0) & (latsr >= 30.0)
-        total_area_nextra = np.sum(weights[selection[0, :, :]])
-        coverage[i, 2] = total_area_nextra
+        total_area_north_extra_tropics = np.sum(weights[selection[0, :, :]])
+        coverage[i, 2] = total_area_north_extra_tropics
 
         selection = ~np.isnan([data[i, :, :]]) & (latsr < 30.0) & (latsr >= 0)
-        total_area_ntropics = np.sum(weights[selection[0, :, :]])
-        coverage[i, 3] = total_area_ntropics
+        total_area_north_tropics = np.sum(weights[selection[0, :, :]])
+        coverage[i, 3] = total_area_north_tropics
 
         selection = ~np.isnan([data[i, :, :]]) & (latsr < 0.0) & (latsr >= -30)
-        total_area_stropics = np.sum(weights[selection[0, :, :]])
-        coverage[i, 4] = total_area_stropics
+        total_area_south_tropics = np.sum(weights[selection[0, :, :]])
+        coverage[i, 4] = total_area_south_tropics
 
         selection = ~np.isnan([data[i, :, :]]) & (latsr >= -65.0) & (latsr < -30)
-        total_area_sextra = np.sum(weights[selection[0, :, :]])
-        coverage[i, 5] = total_area_sextra
+        total_area_south_extra_tropics = np.sum(weights[selection[0, :, :]])
+        coverage[i, 5] = total_area_south_extra_tropics
 
         selection = ~np.isnan([data[i, :, :]]) & (latsr < -65.0)
         total_area_antarctic = np.sum(weights[selection[0, :, :]])
@@ -228,6 +260,13 @@ def calculate_coverage_timeseries(ds):
 
 
 def plot_non_centred_coverage_timeseries(time, smooth_coverage):
+    """
+    Plot the coverage time series
+
+    :param time:
+    :param smooth_coverage:
+    :return:
+    """
     spole = '#58c9db'
     npole = '#58c9db'
     sh_extra = '#8ebf84'
@@ -238,7 +277,8 @@ def plot_non_centred_coverage_timeseries(time, smooth_coverage):
     fig, axs = plt.subplots(1, 1)
     fig.set_size_inches(12, 3)
 
-    plt.fill_between(time, smooth_coverage[:, 6], 0.0 - smooth_coverage[:, 4] - smooth_coverage[:, 5] - smooth_coverage[:, 6], color=spole)
+    plt.fill_between(time, smooth_coverage[:, 6],
+                     0.0 - smooth_coverage[:, 4] - smooth_coverage[:, 5] - smooth_coverage[:, 6], color=spole)
     plt.fill_between(time, smooth_coverage[:, 6], 0.0 - smooth_coverage[:, 4] - smooth_coverage[:, 5], color=sh_extra)
     plt.fill_between(time, smooth_coverage[:, 6], 0.0 - smooth_coverage[:, 4], color=tropics)
 
@@ -328,11 +368,13 @@ def plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_co
 
     # And unfilled
     alfa = 0.3
-    plt.fill_between(time, nz - polar_area + 0.50, nz - polar_area + 0.50 - smooth_coverage_unfilled[:, 6], color='white', alpha=alfa)
+    plt.fill_between(time, nz - polar_area + 0.50, nz - polar_area + 0.50 - smooth_coverage_unfilled[:, 6],
+                     color='white', alpha=alfa)
     plt.fill_between(time, nz - 0.25, nz - 0.25 - smooth_coverage_unfilled[:, 5], color='white', alpha=alfa)
     plt.fill_between(time, nz, 0.0 - smooth_coverage_unfilled[:, 4], color='white', alpha=alfa)
 
-    plt.fill_between(time, nz + polar_area - 0.5, nz + polar_area - 0.5 + smooth_coverage_unfilled[:, 1], color='white', alpha=alfa)
+    plt.fill_between(time, nz + polar_area - 0.5, nz + polar_area - 0.5 + smooth_coverage_unfilled[:, 1], color='white',
+                     alpha=alfa)
     plt.fill_between(time, nz + 0.25, nz + 0.25 + smooth_coverage_unfilled[:, 2], color='white', alpha=alfa)
     plt.fill_between(time, nz, smooth_coverage_unfilled[:, 3], color='white', alpha=alfa)
 
@@ -377,14 +419,16 @@ def plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_co
     plt.text(date(2023, 1, 1), 0.53, f'Now', fontsize=24, va='bottom', ha='center', color=text_color)
     plt.text(date(2023, 1, 1), -0.53, f'Now', fontsize=24, va='top', ha='center', color=text_color)
 
-    plt.savefig(Path('OutputFigures') / 'coverage_comparison_individual.png', dpi=300, transparent=True, bbox_inches='tight')
-    plt.savefig(Path('OutputFigures') / 'coverage_comparison_individual.svg', dpi=300, transparent=True, bbox_inches='tight')
-    plt.savefig(Path('OutputFigures') / 'coverage_comparison_individual.pdf', dpi=300, transparent=True, bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_comparison_individual.png', dpi=300, transparent=True,
+                bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_comparison_individual.svg', dpi=300, transparent=True,
+                bbox_inches='tight')
+    plt.savefig(Path('OutputFigures') / 'coverage_comparison_individual.pdf', dpi=300, transparent=True,
+                bbox_inches='tight')
     plt.close()
 
 
 if __name__ == '__main__':
-
     data_dir_env = os.getenv('DATADIR')
 
     glosat_dir = Path(data_dir_env) / 'GloSAT' / 'analysis' / 'diagnostics'
@@ -410,6 +454,6 @@ if __name__ == '__main__':
     coverage_map(data, 'unfilled')
     time_unfilled, smooth_coverage_unfilled, _ = calculate_coverage_timeseries(ds)
 
-    plot_non_centred_coverage_timeseries(time, smooth_coverage)
-    plot_centred_coverage_timeseries(time, smooth_coverage)
+    # plot_non_centred_coverage_timeseries(time, smooth_coverage)
+    # plot_centred_coverage_timeseries(time, smooth_coverage)
     plot_centred_coverage_comparison_timeseries(time, smooth_coverage, smooth_coverage_unfilled)

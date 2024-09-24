@@ -1,6 +1,6 @@
 """
-Recreate the plot from IPCC AR6 which shows the individual components of long-term temperature change. Nice and
-simple because the IPCC chose a nice easy data format.
+Recreate Figure 3.9 from IPCC AR6 which shows the individual components of long-term temperature change. Nice and
+simple because the IPCC chose a nice easy data format and only stored the necessary data.
 """
 import xarray as xa
 import matplotlib.pyplot as plt

@@ -1,3 +1,7 @@
+"""
+Plot the traditional annual SAM bar chart with red bars for positive SAM and blue bars for negative SAM. The
+extension of the series using a reconstruction is marked by showing uncertainty ranges for the reconstruction.
+"""
 import copy
 
 import matplotlib.pyplot as plt
@@ -56,6 +60,22 @@ def read_bas_sam(filename):
 
 
 def plot_bar(ax, time, value, delta, color_positive, color_negative):
+    """
+    Plot a bar chart bar for a particular time and value.
+
+    :param ax: matplotlib axis
+    :param time: float
+        Time (x-axis) value for the bar
+    :param value: float
+        Top of the bar for positive value, bottom of the bar for negative values. Bars always go from 0 to value
+    :param delta: float
+        Sets the gap between bars. Bars are plotted from time+delta to time+1-delta
+    :param color_positive: str
+        A colour descriptor string to colour the bars with a positive value
+    :param color_negative: str
+        A colour descriptor str to colour the bars with a negative value
+    :return: None
+    """
     x = time + delta
     y = 0
     width = 1 - 2 * delta
@@ -67,6 +87,25 @@ def plot_bar(ax, time, value, delta, color_positive, color_negative):
         ax.add_patch(Rectangle((x, y), width, height, facecolor=color_negative, edgecolor=None))
 
 def plot_uncertainty_bar(ax, time, value, unc, delta, color_positive, color_negative):
+    """
+    Plot a bar chart bar for a particular time, value and uncertainty. The bar stretches from value-uncertainty to
+    value+uncertainty.
+
+    :param ax: matplotlib axis
+    :param time: float
+        Time (x-axis) value for the bar
+    :param value: float
+        Centre of the bar
+    :param unc: float
+        Uncertainty on the value which will be the half height of the bar
+    :param delta: float
+        Sets the gap between bars. Bars are plotted from time+delta to time+1-delta
+    :param color_positive: str
+        A colour descriptor string to colour the bars with a positive value
+    :param color_negative: str
+        A colour descriptor str to colour the bars with a negative value
+    :return: None
+    """
     x = time + delta
     y = value - unc
     width = 1 - 2 * delta

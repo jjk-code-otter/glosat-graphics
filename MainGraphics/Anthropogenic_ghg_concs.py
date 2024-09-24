@@ -1,3 +1,6 @@
+"""
+Plot concentrations of greenhouse gases from instruments and the Law dome ice cores
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path

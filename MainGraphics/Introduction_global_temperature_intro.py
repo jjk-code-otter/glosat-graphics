@@ -1,3 +1,6 @@
+"""
+Plot global temperature series from current global temperature datasets
+"""
 import os
 from pathlib import Path
 import matplotlib.pyplot as plt

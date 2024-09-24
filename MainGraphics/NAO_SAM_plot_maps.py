@@ -1,3 +1,6 @@
+"""
+Plot some land/ocean maps using different projections
+"""
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature

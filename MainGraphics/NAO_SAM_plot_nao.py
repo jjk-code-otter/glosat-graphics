@@ -1,5 +1,7 @@
+"""
+Plot the traditional winter NAO bar chart with red bars for positive NAO and blue bars for negative NAO.
+"""
 import copy
-
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import numpy as np
@@ -37,19 +39,43 @@ def read_nao(filename):
     return years, months, nao
 
 
-def seasonal_running_average(nao):
+def seasonal_running_average(in_array):
+    """
+    Calculate a running seasonal (ie 3-month) average of an array
+
+    :param in_array: ndarray
+        Input array containing monthly values
+    :return:  ndarray
+        Output array containing 3-monthly running average
+    """
     # Calculate seasonal averages
-    nao_3month = copy.deepcopy(nao)
-    nao_3month[:] = np.nan
+    array_3month = copy.deepcopy(in_array)
+    array_3month[:] = np.nan
 
-    for i in range(2, len(nao)):
-        select = nao[i - 2:i + 1]
-        nao_3month[i] = np.mean(select)
+    for i in range(2, len(in_array)):
+        select = in_array[i - 2:i + 1]
+        array_3month[i] = np.mean(select)
 
-    return nao_3month
+    return array_3month
 
 
 def plot_bar(ax, time, value, delta, color_positive, color_negative):
+    """
+    Plot a bar chart bar for a particular time and value.
+
+    :param ax: matplotlib axis
+    :param time: float
+        Time (x-axis) value for the bar
+    :param value: float
+        Top of the bar for positive value, bottom of the bar for negative values. Bars always go from 0 to value
+    :param delta: float
+        Sets the gap between bars. Bars are plotted from time+delta to time+1-delta
+    :param color_positive: str
+        A colour descriptor string to colour the bars with a positive value
+    :param color_negative: str
+        A colour descriptor str to colour the bars with a negative value
+    :return: None
+    """
     x = time + delta
     y = 0
     width = 1 - 2 * delta

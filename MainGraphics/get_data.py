@@ -1,3 +1,6 @@
+"""
+Download those datasets that are small and easy to download
+"""
 from pathlib import Path
 import requests
 import shutil
